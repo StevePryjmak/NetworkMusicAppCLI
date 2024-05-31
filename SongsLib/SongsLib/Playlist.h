@@ -50,8 +50,8 @@ public:
 		void shufflePlaylist() {
 			PlaylistIterator::shuffle = true;
 		}
-		//bool operator==(PlaylistIterator const& i) const noexcept;
-		//bool operator!=(PlaylistIterator const& i) const noexcept;
+		bool operator==(PlaylistIterator const& i) const noexcept;
+		bool operator!=(PlaylistIterator const& i) const noexcept;
 		friend Playlist;
 		private:
 		PlaylistIterator(std::vector<Song>::const_iterator curr, Playlist * playlist, bool shuffle=false) {
@@ -63,14 +63,16 @@ public:
 	};
 private:
 	unsigned int duration = 0;
-	//PlaylistIterator current;
+	// PlaylistIterator current;
 public:
 	Playlist(std::string name);
+	std::string getPlaylist();
 	std::string getName();
 	PlaylistIterator begin();
 	PlaylistIterator end();
 	void addToPlaylist(Song song) noexcept;
 	PlaylistIterator deleteFromPlaylist(PlaylistIterator i);
+	PlaylistIterator deleteFromPlaylist(unsigned int i);
 	unsigned int getDuration() const noexcept;
 	std::string formatDuration() const noexcept;
 };

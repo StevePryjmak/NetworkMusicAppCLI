@@ -18,6 +18,12 @@ Playlist::PlaylistIterator Playlist::deleteFromPlaylist(PlaylistIterator i)
 	return PlaylistIterator(j, this, i.shuffle);
 }
 
+Playlist::PlaylistIterator Playlist::deleteFromPlaylist(unsigned int i)
+{
+	PlaylistIterator it = begin() + i;
+	return this->deleteFromPlaylist(it);
+}
+
 Playlist::PlaylistIterator Playlist::end()
 {
 	return PlaylistIterator(playlist.end(), this);
@@ -31,6 +37,20 @@ Playlist::Playlist(std::string name)
 std::string Playlist::getName()
 {
 	return Playlist::name;
+}
+
+std::string Playlist::getPlaylist()
+{
+	std::string description = "";
+	unsigned int count = 1;
+	PlaylistIterator i = begin();
+	while (i != end()) {
+		description += (std::to_string(count) + ". ");
+		description += (*i).getDescription();
+		description += "\n";
+		count++;
+	}
+	return description;
 }
 
 unsigned int Playlist::getDuration() const noexcept
@@ -47,4 +67,14 @@ std::string Playlist::formatDuration() const noexcept
 		res += "0";
 	res += std::to_string(Playlist::duration % 60);
 	return res;
+}
+
+bool Playlist::PlaylistIterator::operator==(PlaylistIterator const& i) const noexcept
+{
+	return curr == curr;
+}
+
+bool Playlist::PlaylistIterator::operator!=(PlaylistIterator const& i) const noexcept
+{
+	return curr != curr;
 }
