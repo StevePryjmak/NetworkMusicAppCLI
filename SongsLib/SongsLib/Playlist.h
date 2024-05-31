@@ -47,6 +47,9 @@ public:
 			tmp += a;
 			return tmp;
 		}
+		void shufflePlaylist() {
+			PlaylistIterator::shuffle = true;
+		}
 		//bool operator==(PlaylistIterator const& i) const noexcept;
 		//bool operator!=(PlaylistIterator const& i) const noexcept;
 		friend Playlist;
@@ -62,9 +65,9 @@ private:
 	unsigned int duration = 0;
 	PlaylistIterator current;
 public:
-
-	void addToPlaylist(Song* song) noexcept;
-	void deleteFromPlaylist(PlaylistIterator i);
-
+	PlaylistIterator begin();
+	PlaylistIterator end();
+	void addToPlaylist(Song song) noexcept;
+	PlaylistIterator deleteFromPlaylist(PlaylistIterator i);
 };
 
