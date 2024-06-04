@@ -1,4 +1,6 @@
 #include "database.h"
+#include <filesystem>
+
 /*
 * Directories
 * 
@@ -22,12 +24,6 @@
 * | | |-|{songId}
 * | |   |
 * | |   |info.txt
-* | |
-* | |
-* | |-|playlists
-* | | |
-* |	| |{playlistId1}.txt
-* | | |{playlistId2}.txt
 */
 
 /*
@@ -37,19 +33,39 @@
 * 
 */
 
-bool PlaylistDataInterface::isValidName(const std::string name) const noexcept {
+bool PlaylistDataInterface::isValidNewName(const std::string& name, const std::string& login) const noexcept {
+	if (!existName(name, login))
+		return false;
+	if (name.empty() && name.size() > 50)
+		return false;
+	for (char c : name) {
+		if (!std::isalnum(static_cast<unsigned char>(c))) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool PlaylistDataInterface::existName(const std::string& name, const std::string& login) const noexcept {
+	std::ifstream file("User/playlist/" + name);//////////////////////
+	if (file.is_open())
+	{
+		file.close();
+		return true;
+	}
+	else
+		return false;
+}
+bool PlaylistDataInterface::findName(const std::string& name, const std::string& login) const noexcept {
 
 }
-bool PlaylistDataInterface::findName(const std::string name) const noexcept {
+void PlaylistDataInterface::savePlaylist(const Playlist& playlist,const std::string& login) const {
 
 }
-void PlaylistDataInterface::savePlaylist(const Playlist& playlist) const {
+void PlaylistDataInterface::deletePlaylist(const std::string& name,const std::string& login) const {
 
 }
-void PlaylistDataInterface::deletePlaylist(const std::string name) const {
-
-}
-Playlist PlaylistDataInterface::loadPlaylist(const std::string name) const {
+Playlist PlaylistDataInterface::loadPlaylist(const std::string& name,const std::string& login) const {
 
 }
 
@@ -65,10 +81,6 @@ Playlist PlaylistDataInterface::loadPlaylist(const std::string name) const {
 *	{description} 
 */
 
-std::string UserDataInterface::generateHash(const std::string& password) const noexcept {
-
-}
-
 std::string UserDataInterface::getPassword(const std::string& login) const {
 	if (!findLogin(login)) {
 		throw std::exception("Invalid login");
@@ -81,14 +93,30 @@ bool UserDataInterface::findLogin(const std::string& login) const noexcept {
 }
 
 bool UserDataInterface::isValidPassword(const std::string& password) const noexcept {
-	return true;
+
 }
 
-bool UserDataInterface::isValidLogin(const std::string& login) const noexcept {
-	return true;
+bool UserDataInterface::existLogin(const std::string& login) const noexcept {
+	std::ifstream file("Users/" + login);
+	if (file.is_open())
+	{
+		file.close();
+		return true;
+	}
+	else
+		return false;
 }
 
 bool UserDataInterface::isValidNewLogin(const std::string& login) const noexcept {
+	if (existLogin(login))
+		return false;
+	if (login.empty() && login.size() > 50)
+		return false;
+	for (char c : login) {
+		if (!std::isalnum(static_cast<unsigned char>(c))) {
+			return false;
+		}
+	}
 	return true;
 }
 bool UserDataInterface::isValidName(const std::string& name) const noexcept {
@@ -101,7 +129,7 @@ void UserDataInterface::addUser(const std::string& name, const std::string& logi
 	}
 	//create folder
 }
-void UserDataInterface::deleteUser(const std::string login) const {
+void UserDataInterface::deleteUser(const std::string& login) const {
 	if (!findLogin(login)) {
 		throw std::exception("Invalid login");
 	}
@@ -126,14 +154,14 @@ void UserDataInterface::changePassword(const std::string& login, const std::stri
 	//change name
 }
 	
-void UserDataInterface::changeAccessLevel(const std::string login, int newAccessLevel) const {
+void UserDataInterface::changeAccessLevel(const std::string& login, int newAccessLevel) const {
 	if (!findLogin(login)){
 		throw std::exception("Invalid login");
 	}
 	//change accesslevel
 }
 
-virtualUser* UserDataInterface::loadUser(const std::string) const {
+virtualUser* UserDataInterface::loadUser(const std::string& login) const {
 
 }
 /*
@@ -148,12 +176,33 @@ virtualUser* UserDataInterface::loadUser(const std::string) const {
 *	{file path}
 */
 
-bool SongDataInterface::isValidName(const std::string name) const noexcept
+bool SongDataInterface::existName(const std::string& name) const noexcept
 {
-	return false;
+	std::ifstream file("public/song/" + name);
+	if (file.is_open())
+	{
+		file.close();
+		return true;
+	}
+	else
+		return false;
 }
 
-bool SongDataInterface::findName(const std::string name) const noexcept
+bool SongDataInterface::isValidNewName(const std::string& name) const noexcept {
+	if (existName(name))
+		return false;
+	if (name.empty() && name.size() > 50)
+		return false;
+	for (char c : name) {
+		if (!std::isalnum(static_cast<unsigned char>(c))) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
+bool SongDataInterface::findName(const std::string& name) const noexcept
 {
 	return false;
 }
@@ -162,11 +211,15 @@ void SongDataInterface::saveSong(const Song& song) const
 {
 }
 
-void SongDataInterface::deleteSong(const std::string name) const
+void SongDataInterface::deleteSong(const std::string& name) const
 {
 }
 
-Song SongDataInterface::loadSong(const std::string name) const
+Song SongDataInterface::loadSong(const std::string& name) const
 {
 	return Song();
+}
+
+std::string generateHash(const std::string& password) noexcept {
+
 }
