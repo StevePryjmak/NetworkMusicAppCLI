@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include <stdexcept>
-#include "..\SongsLib\Song.h"
-#include "..\SongsLib\Playlist.h"
+#include <Networking/server/SongLib/Song.h>
+#include <Networking/server/SongLib/Playlist.h>
 
 TEST(PlaylistTestConstructor, EmptyPlaylist) {
 	Playlist p("MyPlaylist");

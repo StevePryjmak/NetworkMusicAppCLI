@@ -1,5 +1,6 @@
-#include "database.h"
+#include <Networking/server/DatabaseLib/database.h>
 #include <filesystem>
+
 
 /*
 * Directories
@@ -57,7 +58,9 @@ bool PlaylistDataInterface::existName(const std::string& name, const std::string
 		return false;
 }
 bool PlaylistDataInterface::findName(const std::string& name, const std::string& login) const noexcept {
-
+	
+	std::terminate();
+	return 0;
 }
 void PlaylistDataInterface::savePlaylist(const Playlist& playlist,const std::string& login) const {
 
@@ -65,6 +68,7 @@ void PlaylistDataInterface::savePlaylist(const Playlist& playlist,const std::str
 void PlaylistDataInterface::deletePlaylist(const std::string& name,const std::string& login) const {
 
 }
+
 Playlist PlaylistDataInterface::loadPlaylist(const std::string& name,const std::string& login) const {
 
 }
@@ -83,9 +87,9 @@ Playlist PlaylistDataInterface::loadPlaylist(const std::string& name,const std::
 
 std::string UserDataInterface::getPassword(const std::string& login) const {
 	if (!findLogin(login)) {
-		throw std::exception("Invalid login");
+		throw std::runtime_error("Invalid login");
 	}
-	return "HiszpañskaInkwizycja1@";
+	return "Hiszpaï¿½skaInkwizycja1@";
 }
 
 bool UserDataInterface::findLogin(const std::string& login) const noexcept {
@@ -125,45 +129,45 @@ bool UserDataInterface::isValidName(const std::string& name) const noexcept {
 
 void UserDataInterface::addUser(const std::string& name, const std::string& login, const std::string& password) const {
 	if (!isValidName(name) || !isValidNewLogin(login) || !isValidPassword(password)) {
-		throw std::exception("Invalid Credentials");
+		throw std::runtime_error("Invalid Credentials");
 	}
 	//create folder
 }
 void UserDataInterface::deleteUser(const std::string& login) const {
 	if (!findLogin(login)) {
-		throw std::exception("Invalid login");
+		throw std::runtime_error("Invalid login");
 	}
 }
 void UserDataInterface::changeName(const std::string& login, const std::string& name) const {
 	if (!findLogin(login)) {
-		throw std::exception("Invalid login");
+		throw std::runtime_error("Invalid login");
 	}
 	if (!isValidName(name)) {
-		throw std::exception("Invalid name");
+		throw std::runtime_error("Invalid name");
 	}
 	//change name
 }
 
 void UserDataInterface::changePassword(const std::string& login, const std::string& oldPass, const std::string& newPass) const {
 	if (getPassword(login) == generateHash(oldPass)) {
-		throw std::exception("Invalid credentials");
+		throw std::runtime_error("Invalid credentials");
 	}
 	if (!isValidPassword(newPass)) {
-		throw std::exception("Invalid password");
+		throw std::runtime_error("Invalid password");
 	}
 	//change name
 }
 	
 void UserDataInterface::changeAccessLevel(const std::string& login, int newAccessLevel) const {
 	if (!findLogin(login)){
-		throw std::exception("Invalid login");
+		throw std::runtime_error("Invalid login");
 	}
 	//change accesslevel
 }
 
-virtualUser* UserDataInterface::loadUser(const std::string& login) const {
+// virtualUser* UserDataInterface::loadUser(const std::string& login) const {
 
-}
+// }
 /*
 * Song
 * 
@@ -217,7 +221,7 @@ void SongDataInterface::deleteSong(const std::string& name) const
 
 Song SongDataInterface::loadSong(const std::string& name) const
 {
-	return Song();
+	//return Song(); // not compiling because sond dont have default constructor
 }
 
 std::string generateHash(const std::string& password) noexcept {

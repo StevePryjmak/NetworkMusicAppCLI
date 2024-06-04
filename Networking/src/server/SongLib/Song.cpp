@@ -1,4 +1,4 @@
-#include "Song.h"
+#include <Networking/server/SongLib/Song.h>
 #include "stdexcept"
 
 Song::Song(unsigned int id, std::string name, std::string artist, std::string genre, unsigned int duration, unsigned int year)

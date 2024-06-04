@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include <stdexcept>
-#include "..\SongsLib\Song.h"
+#include <Networking/server/SongLib/Song.h>
 #include "stdlib.h"
 
 TEST(SongTestConstructor, TypicalConstructor) {

@@ -1,4 +1,4 @@
-#include "Playlist.h"
+#include <Networking/server/SongLib/Playlist.h>
 
 void Playlist::addToPlaylist(Song song) noexcept
 {

@@ -3,8 +3,9 @@
 #include <exception>
 #include <vector>
 #include <fstream>
-#include "song.h"
-#include "playlist.h"
+#include <Networking/server/SongLib/Song.h>
+#include <Networking/server/SongLib/Playlist.h>
+#include <iostream>
 
 class PlaylistDataInterface {
 private:
@@ -31,7 +32,6 @@ public:
 	void changeName(const std::string& login, const std::string& name) const;
 	void changePassword(const std::string& login, const std::string& oldPass, const std::string& newPass) const;
 	void changeAccessLevel(const std::string& login, int newAccessLevel) const;
-	virtualUser* loadUser(const std::string& login) const;
 };
 
 class SongDataInterface {

@@ -2,7 +2,7 @@
 
 #include <Networking/server/tcp_connection.h>
 //#include <Networking/server/Lib/VirtualUser.h>
-#include <Networking/server/Lib/User.h>
+#include <Networking/server/UserLib/User.h>
 #include <boost/asio.hpp>
 #include <unordered_set>
 #include <optional>
