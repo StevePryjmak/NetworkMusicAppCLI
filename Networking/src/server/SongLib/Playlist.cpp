@@ -1,4 +1,5 @@
 #include <Networking/server/SongLib/Playlist.h>
+//#include "Playlist.h"
 
 void Playlist::addToPlaylist(Song song) noexcept
 {
@@ -6,7 +7,7 @@ void Playlist::addToPlaylist(Song song) noexcept
 	Playlist::duration += song.getDuration();
 }
 
-Playlist::PlaylistIterator Playlist::begin()
+Playlist::PlaylistIterator Playlist::begin() const
 {
 	return PlaylistIterator(playlist.begin(), this);
 }
@@ -24,7 +25,7 @@ Playlist::PlaylistIterator Playlist::deleteFromPlaylist(unsigned int i)
 	return this->deleteFromPlaylist(it);
 }
 
-Playlist::PlaylistIterator Playlist::end()
+Playlist::PlaylistIterator Playlist::end() const
 {
 	return PlaylistIterator(playlist.end(), this);
 }
@@ -34,12 +35,12 @@ Playlist::Playlist(std::string name)
 	Playlist::name = name;
 }
 
-std::string Playlist::getName()
+std::string Playlist::getName() const noexcept
 {
 	return Playlist::name;
 }
 
-std::string Playlist::getPlaylist()
+std::string Playlist::getPlaylist() const noexcept
 {
 	std::string description = "";
 	unsigned int count = 1;
@@ -67,6 +68,14 @@ std::string Playlist::formatDuration() const noexcept
 		res += "0";
 	res += std::to_string(Playlist::duration % 60);
 	return res;
+}
+
+std::string Playlist::getDescription() const noexcept
+{
+	std::string res = getName();
+	res += " | ";
+	res += formatDuration();
+    return res;
 }
 
 bool Playlist::PlaylistIterator::operator==(PlaylistIterator const& i) const noexcept
