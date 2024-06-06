@@ -38,7 +38,7 @@ public:
 			if (curr == pl->playlist.end())
 				throw std::range_error("Index out of range");
 			if (!shuffle)
-				curr++;
+				++curr;
 			else {
 				curr = (pl->playlist.begin() + (rand() % pl->playlist.size()));
 			}
@@ -91,6 +91,7 @@ public:
 	std::string getName() const noexcept;
 	PlaylistIterator begin() const;
 	PlaylistIterator end() const;
+	Song getCurrent();
 	void addToPlaylist(Song song) noexcept;
 	PlaylistIterator deleteFromPlaylist(PlaylistIterator i);
 	PlaylistIterator deleteFromPlaylist(unsigned int i);
@@ -102,6 +103,8 @@ public:
 	void unshuffle() noexcept;
 	void skip() noexcept;
 	void show() const noexcept;
+	void deleteSong(unsigned int i);
+	//void addSong(Song song) noexcept;
 
 };
 
