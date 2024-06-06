@@ -21,5 +21,6 @@ public:
 	unsigned int getDuration() const noexcept;
 	std::string formatDuration() const noexcept;
 	unsigned int getYear() const noexcept;
+	unsigned int getId() const noexcept;
 };
 
