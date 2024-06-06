@@ -69,9 +69,9 @@ void PlaylistDataInterface::deletePlaylist(const std::string& name,const std::st
 
 }
 
-Playlist PlaylistDataInterface::loadPlaylist(const std::string& name,const std::string& login) const {
+// Playlist PlaylistDataInterface::loadPlaylist(const std::string& name,const std::string& login) const {
 
-}
+// }
 
 /*
 * User
@@ -96,9 +96,9 @@ bool UserDataInterface::findLogin(const std::string& login) const noexcept {
 	return true;
 }
 
-bool UserDataInterface::isValidPassword(const std::string& password) const noexcept {
+// bool UserDataInterface::isValidPassword(const std::string& password) const noexcept {
 
-}
+// }
 
 bool UserDataInterface::existLogin(const std::string& login) const noexcept {
 	std::ifstream file("Users/" + login);
@@ -219,11 +219,11 @@ void SongDataInterface::deleteSong(const std::string& name) const
 {
 }
 
-Song SongDataInterface::loadSong(const std::string& name) const
-{
-	//return Song(); // not compiling because sond dont have default constructor
-}
+// Song SongDataInterface::loadSong(const std::string& name) const
+// {
+// 	//return Song(); // not compiling because sond dont have default constructor
+// }
 
-std::string generateHash(const std::string& password) noexcept {
+// std::string generateHash(const std::string& password) noexcept {
 
-}
+// }

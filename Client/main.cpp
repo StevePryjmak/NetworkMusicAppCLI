@@ -2,6 +2,7 @@
 #include <iostream>
 #include <thread>
 #include <atomic>
+#include <conio.h> 
 
 std::atomic<bool> disconnected {false}; // Atomic flag to track disconnection
 
@@ -93,8 +94,9 @@ int main(int argc, char* argv[]) {
 
         if (message == "\\q" || disconnected) break;
         message += "\n";
-
+        system("cls");
         client.Post(message + " \n");
+        std::cout << "Waiting for server responce" << std::endl;
     }
 
     client.stop();

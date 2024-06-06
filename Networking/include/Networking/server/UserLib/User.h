@@ -2,36 +2,32 @@
 #include <iostream>
 #include "VirtualUser.h"
 
+
 class User : public VirtualUser {
 protected:
-    void initializeCommands() {
-        command_map = {
-            {"1", {"My Profile", "Displays user's profile", [this]() { my_profile(); }}},
-            {"2", {"Generate Random Playlist", "Generates a random playlist", [this]() { generate_random_playlist(); }}},
-            {"3", {"Show Playlists", "Shows user playlists", [this]() { show_playlists(); }}},
-            {"4", {"Favorites", "Shows user's favorite songs", [this]() { favorites(); }}},
-            {"5", {"Become Artist", "Switches user role to artist", [this]() { become_artist(); }}},
-            {"6", {"Log Out", "Logs out user", [this]() { log_out(); }}},
-            {"7", {"Test", "Test command", [this]() { test(); }}},
-            {"8", {"Delete Playlist", "Deletes a playlist", [this]() { delete_playlist(); }}},
-        };
+    void initialize_commands() override {
+        add_function("1", "My_prifile", std::function<void()>(std::bind(&User::my_profile, this)));
+        add_function("2", "Show Playlists", std::function<void()>(std::bind(&User::show_playlists, this)));
+        add_function("3", "Favorites", std::function<void()>(std::bind(&User::favorites, this)));
+        add_function("4", "Become Artist", std::function<void()>(std::bind(&User::become_artist, this)));
+        add_function("5", "Log Out", std::function<void()>(std::bind(&User::log_out, this)));
+        add_function("6", "Generate Random Playlist", std::function<void()>(std::bind(&User::generate_random_playlist, this)));
+        add_function("7", "Delete Playlist (Input playlist name)", std::function<void(std::string)>(std::bind(&User::delete_playlist, this, std::placeholders::_1)));
     }
 
 public:
     User(const std::string& name, const std::string& login, const std::string& password);
 
     std::string get_option() override;
-    void test() { std::cout << "User test" << std::endl; }
 
     void log_out() override {} // probably no needed
-    void show_playlists() override { output = "Implement show_playlists form bd";}
-    void generate_random_playlist() override { output = "Implement generate_random_playlist form bd";}
-    void favorites() override { output = "Implement favorites form bd";}
-    void my_profile() override;
-    void delete_playlist() override {}
-    void become_artist() override { output = "Implement become_artist by changing this* to artist";}
+    void show_playlists() override {output = "Show playlists\n"; std::cout << output;}
+    void generate_random_playlist() override {output = "Generate random playlist\n"; std::cout << output;}
+    void favorites() override {output = "Favorites\n"; std::cout << output;}
+    std::string my_profile() override;
+    void delete_playlist(std::string palylist_name) override {output = "Playlist " + palylist_name + " deleted\n"; std::cout << output;}
+    void become_artist() override {}
 
-    std::string executeCommand(const std::string& command, int args_count, ...) override;
 };
 
 

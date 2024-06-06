@@ -1,52 +1,29 @@
 #pragma once
 #include "User.h"
 
-class Admin : public User {
-
-public:
-    Admin(std::string name, std::string login, std::string password) : User(name, login, password) {}
-
-    void log_out() override {}; // save data (also depends if function on in client or server)
-
-
-
-    //void ban(); // ban user
-    //void unban(); // unban user
-    void test() {std::cout<<"Function was caled secsefuly using dynamic cast"<<std::endl;} // test function to check if dynamic cast works;
-    void show_all_users(); // show all users
-    void show_all_artists(); // show all artists
-    void show_all_admins(); // show all admins
-    //void show_all_banned(); // show all banned users
-    void add_admin(); // add admin to use those class sould use dynamic cast
-
-};
-
-
 
 class Admin : public User {
 protected:
-    void initializeCommands() {
-        command_map = {
-            {"1", {"My Profile", "Displays user's profile", [this]() { my_profile(); }}},
-            {"2", {"Generate Random Playlist", "Generates a random playlist", [this]() { generate_random_playlist(); }}},
-            {"3", {"Show Playlists", "Shows user playlists", [this]() { show_playlists(); }}},
-            {"4", {"Favorites", "Shows user's favorite songs", [this]() { favorites(); }}},
-            {"5", {"Become Artist", "Switches user role to artist", [this]() { become_artist(); }}},
+    void initialize_commands() override{
+        add_function("1", "My_prifile", std::function<void()>(std::bind(&Admin::my_profile, this)));
+        add_function("2", "Show Playlists", std::function<void()>(std::bind(&Admin::show_playlists, this)));
+        add_function("3", "Favorites", std::function<void()>(std::bind(&Admin::favorites, this)));
+        add_function("4", "Become Artist", std::function<void()>(std::bind(&Admin::become_artist, this)));
+        add_function("5", "Log Out", std::function<void()>(std::bind(&Admin::log_out, this)));              // could be removed later
+        add_function("6", "Generate Random Playlist", std::function<void()>(std::bind(&Admin::generate_random_playlist, this)));
+        add_function("7", "Delete Playlist", std::function<void(std::string)>(std::bind(&Admin::delete_playlist, this, std::placeholders::_1)));
+        add_function("8", "Show All Users", std::function<void()>(std::bind(&Admin::show_all_users, this)));
+        add_function("9", "Show All Artists", std::function<void()>(std::bind(&Admin::show_all_artists, this)));
+        add_function("10", "Show All Admins", std::function<void()>(std::bind(&Admin::show_all_admins, this)));
+        add_function("11", "Add Admin(input username)", std::function<void(std::string)>(std::bind(&Admin::add_admin, this, std::placeholders::_1)));
 
-            //{"6", {"Log Out", "Logs out user", [this]() { log_out(); }}},
-            {"6", {"Test", "Test command", [this]() { test(); }}},
-            {"7", {"Delete Playlist", "Deletes a playlist", [this]() { delete_playlist(); }}},
-            {"8", {"Show All Users", "Shows all users", [this]() { show_all_users(); }}},
-            {"9", {"Show All Artists", "Shows all artists", [this]() { show_all_artists(); }}},
-            {"10", {"Show All Admins", "Shows all admins", [this]() { show_all_admins(); }}},
-            {"11", {"Add Admin", "Adds an admin", [this]() { add_admin(); }}},
-        };
+
     }
 
 public:
     Admin(const std::string& name, const std::string& login, const std::string& password)
         : User(name, login, password) {
-        initializeCommands();
+        initialize_commands();
     }
 
     //----------------------------------------------------------------
@@ -62,5 +39,5 @@ public:
     void show_all_users() { output = "Implement showing all users"; }
     void show_all_artists() { output = "Implement showing all artists"; }
     void show_all_admins() { output = "Implement howing all admins" ; }
-    void add_admin() { output = "Implement adding admin"; }
+    void add_admin(std::string username) { output = "Implemet " + username + " Additoin to users"; }
 };

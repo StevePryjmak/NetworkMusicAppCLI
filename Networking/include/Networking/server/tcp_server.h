@@ -1,8 +1,9 @@
 #pragma once
 
 #include <Networking/server/tcp_connection.h>
-//#include <Networking/server/Lib/VirtualUser.h>
 #include <Networking/server/UserLib/User.h>
+#include <Networking/server/UserLib/Admin.h>
+#include <Networking/server/UserLib/Artist.h>
 #include <boost/asio.hpp>
 #include <unordered_set>
 #include <optional>
