@@ -113,50 +113,52 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
         ss >> username;
         ss >> password;
         std::cout << username << " " << password << std::endl;
-        it->second = new User("User", username, password);
+        it->second = new Artist("User", username, password);
 
 
 
         const std::string& message1 = "logined\n";
         std::cout<< message1 <<std::endl;
-        //Broadcast(message1);
         connection->Post(message1);
         connection->Post("Chose opthin: \n" + it->second->get_option()); // + "\n"
-        // std::string username;
-        // ss >> username;
-        // if (it != connections.end()) {
-        //     auto user = it->second;
-        //     if (user != nullptr) {
-        //         user->set_username(username);
-        //     }
+        return;
     }
 
-    option = get_first_word(message);
-    //option = get_first_word(message);
-    std::cout << option << std::endl;
     auto user = it->second;
-    if (user != nullptr) {
-        std::string response = user->executeCommand(option, 0);
-        connection->Post(response + "\n\n");
-        connection->Post("Chose opthin: \n" + it->second->get_option()); 
-    } else {
-        Broadcast("User is nullptr\n");
+    Admin* admin = dynamic_cast<Admin*>(user);
+    Artist* artist = dynamic_cast<Artist*>(user); // maybe it will be neded later
+
+    if (user == nullptr) {
+        connection->Post("You must log in first\n");
+        return;
+    }
+
+    if (option == "7") {
+        std::string argument1;
+        ss >> argument1;
+        user->execute_command<void(std::string)>(option, argument1);
+    }
+    if (option == "11" && admin != nullptr) {
+        std::string argument1;
+        ss >> argument1;
+        user->execute_command<void(std::string)>(option, argument1);
+    }
+    if(option == "9" && artist != nullptr) { // this and priwious could be done in one if
+        std::string argument1;
+        ss >> argument1;
+        user->execute_command<void(std::string)>(option, argument1);
+    }
+    else
+    {
+        user->execute_command<void()>(option);
     }
 
 
-    
-//     auto user = it->second;
-//     if (user != nullptr) {
-//         user->test();
-//     } else {
-//         Broadcast(message);
 
-//         //const std::string& message1 = "User is nullptr\n";
-//         //connection->Post(message1);
-//         //Broadcast(message1);
-//         //it->first->Post(message1);
-//         //std::cout << "User is nullpt" << std::endl;
-//     }
+    std::string response =  user->output;
+    connection->Post(response + "\n\n");
+    connection->Post("Chose opthin: \n" + it->second->get_option()); 
+
 }
 
 
