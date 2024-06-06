@@ -1,5 +1,4 @@
 #include <Networking/server/DatabaseLib/database.h>
-#include <filesystem>
 
 
 /*
@@ -22,25 +21,44 @@
 * | |
 * | |-|songs
 * | | |
-* | | |-|{songId}
-* | |   |
-* | |   |info.txt
+* | | |-|{songId.txt}
 */
 
 /*
 * Playlist
 * 
-* {playlistId1}.txt - coma separated songIds
+* {playlistId1}.txt - space separated songIds
 * 
 */
+std::string replaceSpaces(const std::string& str)
+{
+    std::string result = str;
+    for (char& c : result) {
+        if (c == ' ') {
+            c = '_';
+        }
+    }
+	return result;
+}
+
+std::string restoreSpaces(const std::string& str)
+{
+   std::string result = str;
+    for (char& c : result) {
+        if (c == '_') {
+            c = ' ';
+        }
+    }
+	return result;
+}
 
 bool PlaylistDataInterface::isValidNewName(const std::string& name, const std::string& login) const noexcept {
-	if (!existName(name, login))
+	if (existName(name, login))
 		return false;
 	if (name.empty() && name.size() > 50)
 		return false;
 	for (char c : name) {
-		if (!std::isalnum(static_cast<unsigned char>(c))) {
+		if (!(std::isalnum(c)) || c == ' ') {
 			return false;
 		}
 	}
@@ -48,7 +66,7 @@ bool PlaylistDataInterface::isValidNewName(const std::string& name, const std::s
 }
 
 bool PlaylistDataInterface::existName(const std::string& name, const std::string& login) const noexcept {
-	std::ifstream file("User/playlist/" + name);//////////////////////
+	std::ifstream file("Users/" + replaceSpaces(login) + "/userPlaylists/" + replaceSpaces(name)+ ".txt");
 	if (file.is_open())
 	{
 		file.close();
@@ -57,21 +75,41 @@ bool PlaylistDataInterface::existName(const std::string& name, const std::string
 	else
 		return false;
 }
-bool PlaylistDataInterface::findName(const std::string& name, const std::string& login) const noexcept {
-	
-	std::terminate();
-	return 0;
-}
-void PlaylistDataInterface::savePlaylist(const Playlist& playlist,const std::string& login) const {
+
+void PlaylistDataInterface::savePlaylist(Playlist& playlist,const std::string& login) {
+	std::ofstream file("users/" + replaceSpaces(login) + "/userPlaylists/" + replaceSpaces(playlist.getName())+ ".txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	for(auto i = playlist.begin(); i != playlist.end(); i++)
+	{
+		file<<(*i).getId()<<" ";
+	}
+	file<<std::endl;
+	file.close();
 
 }
-void PlaylistDataInterface::deletePlaylist(const std::string& name,const std::string& login) const {
-
+void PlaylistDataInterface::deletePlaylist(const std::string& name, const std::string& login) const {
+	if (!std::filesystem::remove("users/" + replaceSpaces(login) + "/userPlaylists/" + replaceSpaces(name)+ ".txt"))
+		throw std::runtime_error("Unable to delete file");
 }
 
-// Playlist PlaylistDataInterface::loadPlaylist(const std::string& name,const std::string& login) const {
-
-// }
+Playlist PlaylistDataInterface::loadPlaylist(const std::string& name,const std::string& login) const {
+	std::ifstream file("users/" + replaceSpaces(login) + "/userPlaylists/" + replaceSpaces(name) + ".txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	Playlist pl = Playlist(name);
+	int songId;
+	while(file >> songId)
+	{
+		pl.addToPlaylist(loadSong(songId));
+	}
+	file.close();
+	return pl;
+}
 
 /*
 * User
@@ -79,29 +117,30 @@ void PlaylistDataInterface::deletePlaylist(const std::string& name,const std::st
 * login must be uniqe
 * 
 * credentials.txt
-*	{name} 
-*   {password} 
-*   {accessLevel}
-*	{description} 
+*	{password} {name} {accessLevel}
 */
 
 std::string UserDataInterface::getPassword(const std::string& login) const {
-	if (!findLogin(login)) {
+	if (!existLogin(login)) {
 		throw std::runtime_error("Invalid login");
 	}
-	return "Hiszpa�skaInkwizycja1@";
+	std::ifstream file("users/" + replaceSpaces(login)+"/credentials.txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	std::string pass;
+	file>>pass;
+	file.close();
+	return pass;
 }
 
-bool UserDataInterface::findLogin(const std::string& login) const noexcept {
+bool UserDataInterface::isValidPassword(const std::string& password) const noexcept {
 	return true;
 }
 
-// bool UserDataInterface::isValidPassword(const std::string& password) const noexcept {
-
-// }
-
 bool UserDataInterface::existLogin(const std::string& login) const noexcept {
-	std::ifstream file("Users/" + login);
+	std::ofstream file("users/" + replaceSpaces(login)+"/credentials.txt");
 	if (file.is_open())
 	{
 		file.close();
@@ -117,72 +156,74 @@ bool UserDataInterface::isValidNewLogin(const std::string& login) const noexcept
 	if (login.empty() && login.size() > 50)
 		return false;
 	for (char c : login) {
-		if (!std::isalnum(static_cast<unsigned char>(c))) {
+		if (!std::isalnum(c)) {
 			return false;
 		}
 	}
 	return true;
 }
 bool UserDataInterface::isValidName(const std::string& name) const noexcept {
+	if (name.empty() && name.size() > 50)
+		return false;
+	for (char c : name) {
+		if (!std::isalnum(c)) {
+			return false;
+		}
+	}
 	return true;
 }
 
-void UserDataInterface::addUser(const std::string& name, const std::string& login, const std::string& password) const {
+void UserDataInterface::addUser(const std::string& name, const std::string& login, const std::string& password, unsigned int privilageLevele) const {
 	if (!isValidName(name) || !isValidNewLogin(login) || !isValidPassword(password)) {
 		throw std::runtime_error("Invalid Credentials");
 	}
-	//create folder
+	std::filesystem::create_directories("users/"+ replaceSpaces(login) + "/userPlaylists");
+	std::ofstream file("users/" + replaceSpaces(login)+"/credentials.txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	file<<password<<" "<<replaceSpaces(name)<<" "<<privilageLevele<<std::endl;
+	file.close();
 }
 void UserDataInterface::deleteUser(const std::string& login) const {
-	if (!findLogin(login)) {
-		throw std::runtime_error("Invalid login");
-	}
-}
-void UserDataInterface::changeName(const std::string& login, const std::string& name) const {
-	if (!findLogin(login)) {
-		throw std::runtime_error("Invalid login");
-	}
-	if (!isValidName(name)) {
-		throw std::runtime_error("Invalid name");
-	}
-	//change name
+	if (!std::filesystem::remove("users/" + replaceSpaces(login)+"/credentials.txt"))
+		throw std::runtime_error("Unable to delete file");
 }
 
-void UserDataInterface::changePassword(const std::string& login, const std::string& oldPass, const std::string& newPass) const {
-	if (getPassword(login) == generateHash(oldPass)) {
-		throw std::runtime_error("Invalid credentials");
-	}
-	if (!isValidPassword(newPass)) {
-		throw std::runtime_error("Invalid password");
-	}
-	//change name
-}
-	
 void UserDataInterface::changeAccessLevel(const std::string& login, int newAccessLevel) const {
-	if (!findLogin(login)){
+	if (!existLogin(login)){
 		throw std::runtime_error("Invalid login");
 	}
-	//change accesslevel
+	std::ifstream file("users/" + replaceSpaces(login)+"/credentials.txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	std::string pass;
+	file>>pass;
+	std::string name;
+	file>>name;
+	file.close();
+	std::ofstream ofile("users/" + replaceSpaces(login)+"/credentials.txt");
+	if (!ofile.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	ofile<<pass<<" "<<name<<" "<<newAccessLevel<<std::endl;
+	ofile.close();
 }
 
-// virtualUser* UserDataInterface::loadUser(const std::string& login) const {
-
-// }
 /*
 * Song
 * 
 * info.txt
-*	{name}
-*	{artist}
-*	{genre}
-*	{duration}
-*	{year}
-*	{file path}
+*	{name} {artist} {genre} {duration} {year}
 */
 
-bool SongDataInterface::existName(const std::string& name) const noexcept
+bool SongDataInterface::existId(unsigned int id) const noexcept
 {
-	std::ifstream file("public/song/" + name);
+	std::ifstream file("public/song/" + std::to_string(id) + ".txt");
 	if (file.is_open())
 	{
 		file.close();
@@ -192,38 +233,48 @@ bool SongDataInterface::existName(const std::string& name) const noexcept
 		return false;
 }
 
-bool SongDataInterface::isValidNewName(const std::string& name) const noexcept {
-	if (existName(name))
-		return false;
-	if (name.empty() && name.size() > 50)
-		return false;
-	for (char c : name) {
-		if (!std::isalnum(static_cast<unsigned char>(c))) {
-			return false;
-		}
-	}
-	return true;
-}
-
-
-bool SongDataInterface::findName(const std::string& name) const noexcept
-{
-	return false;
-}
-
 void SongDataInterface::saveSong(const Song& song) const
 {
+	std::ofstream file("public/songs/" + std::to_string(song.getId()) + ".txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	file<<replaceSpaces(song.getName())<<" "<<replaceSpaces(song.getArtist())<<" "<<replaceSpaces(song.getGenre())<<" "
+	<<song.getDuration()<<" "<<song.getYear()<<std::endl;
+	file.close();
 }
 
-void SongDataInterface::deleteSong(const std::string& name) const
+void SongDataInterface::deleteSong(unsigned int id) const
 {
+		if (!std::filesystem::remove("public/songs/" + std::to_string(id) + ".txt"))
+			throw std::runtime_error("Unable to delete file");
 }
 
-// Song SongDataInterface::loadSong(const std::string& name) const
-// {
-// 	//return Song(); // not compiling because sond dont have default constructor
-// }
+Song SongDataInterface::loadSong(unsigned int id) const
+{
+	std::ifstream file("public/songs/" + std::to_string(id) + ".txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	std::string name;
+	file>>name;
+	std::string artist;
+	file>>artist;
+	std::string genre;
+	file>>genre;
+	unsigned int duration;
+	file>>duration;
+	unsigned int year;
+	file>>year;
+	Song s = Song(id, restoreSpaces(name), restoreSpaces(artist),
+	restoreSpaces(genre), duration, year);
+	file.close();
+	return s;
+}
 
-// std::string generateHash(const std::string& password) noexcept {
-
-// }
+std::string generateHash(const std::string& password) noexcept 
+{
+	return password;
+}

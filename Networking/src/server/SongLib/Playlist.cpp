@@ -6,7 +6,7 @@ void Playlist::addToPlaylist(Song song) noexcept
 	Playlist::duration += song.getDuration();
 }
 
-Playlist::PlaylistIterator Playlist::begin()
+Playlist::PlaylistIterator Playlist::begin() const
 {
 	return PlaylistIterator(playlist.begin(), this);
 }
@@ -24,7 +24,7 @@ Playlist::PlaylistIterator Playlist::deleteFromPlaylist(unsigned int i)
 	return this->deleteFromPlaylist(it);
 }
 
-Playlist::PlaylistIterator Playlist::end()
+Playlist::PlaylistIterator Playlist::end() const
 {
 	return PlaylistIterator(playlist.end(), this);
 }
@@ -34,12 +34,12 @@ Playlist::Playlist(std::string name)
 	Playlist::name = name;
 }
 
-std::string Playlist::getName()
+std::string Playlist::getName() const noexcept
 {
 	return Playlist::name;
 }
 
-std::string Playlist::getPlaylist()
+std::string Playlist::getPlaylist() const noexcept
 {
 	std::string description = "";
 	unsigned int count = 1;
@@ -69,6 +69,40 @@ std::string Playlist::formatDuration() const noexcept
 	return res;
 }
 
+std::string Playlist::getDescription() const noexcept
+{
+	std::string res = getName();
+	res += " | ";
+	res += formatDuration();
+    return res;
+}
+
+void Playlist::play() noexcept
+{
+	current = begin();
+	std::cout << (*current).getDescription() << "\n";
+}
+
+void Playlist::shuffle() noexcept
+{
+	current.shufflePlaylist();
+}
+
+void Playlist::unshuffle() noexcept
+{
+	current.unshufflePlaylist();
+}
+
+void Playlist::skip() noexcept
+{
+	++current;
+	std::cout << (*current).getDescription() << "\n";
+}
+
+void Playlist::show() const noexcept
+{
+	std::cout << getPlaylist();
+}
 bool Playlist::PlaylistIterator::operator==(PlaylistIterator const& i) const noexcept
 {
 	return curr == curr;

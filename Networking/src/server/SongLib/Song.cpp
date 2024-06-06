@@ -65,3 +65,8 @@ unsigned int Song::getYear() const noexcept
 {
 	return Song::year;
 }
+
+unsigned int Song::getId() const noexcept
+{
+	return id;
+}
