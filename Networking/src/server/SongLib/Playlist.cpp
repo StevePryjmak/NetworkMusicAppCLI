@@ -1,5 +1,4 @@
 #include <Networking/server/SongLib/Playlist.h>
-//#include "Playlist.h"
 
 void Playlist::addToPlaylist(Song song) noexcept
 {
@@ -78,6 +77,32 @@ std::string Playlist::getDescription() const noexcept
     return res;
 }
 
+void Playlist::play() noexcept
+{
+	current = begin();
+	std::cout << (*current).getDescription() << "\n";
+}
+
+void Playlist::shuffle() noexcept
+{
+	current.shufflePlaylist();
+}
+
+void Playlist::unshuffle() noexcept
+{
+	current.unshufflePlaylist();
+}
+
+void Playlist::skip() noexcept
+{
+	++current;
+	std::cout << (*current).getDescription() << "\n";
+}
+
+void Playlist::show() const noexcept
+{
+	std::cout << getPlaylist();
+}
 bool Playlist::PlaylistIterator::operator==(PlaylistIterator const& i) const noexcept
 {
 	return curr == curr;

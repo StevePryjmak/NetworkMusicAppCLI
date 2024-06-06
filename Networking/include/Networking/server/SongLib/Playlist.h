@@ -4,6 +4,7 @@
 #include <string>
 #include <stdexcept>
 #include <stdlib.h>
+#include <iostream>
 #include <map>
 #include <functional>
 
@@ -16,11 +17,12 @@ protected:
 	std::map<std::string, CommandInfo> command_map;
     void initializeCommands() {
         command_map = {
-            {"1", {"Play", "Plays the song", [this]() { play(); }}},
-			{"2", {"Skip", "Skip the song", [this]() { skip(); }}},
-            {"3", {"Shuffle", "Shuffles playlist", [this]() { shuffle(); }}},
-            {"4", {"Unshuffle", "Unshuffles playlist", [this]() { unshuffle(); }}},
-			{"5", {"Delete song", "Unshuffles playlist", [this]() { unshuffle(); }}},
+			{"1", {"Show", "Show contents of the playlist", [this]() { show(); }}},
+            {"2", {"Play", "Plays the song", [this]() { play(); }}},
+			{"3", {"Skip", "Skip the song", [this]() { skip(); }}},
+            {"4", {"Shuffle", "Shuffles playlist", [this]() { shuffle(); }}},
+            {"5", {"Unshuffle", "Unshuffles playlist", [this]() { unshuffle(); }}},
+			//{"5", {"Delete song", "Deletes song", [this]() { unshuffle(); }}},
         };
     }
 private:
@@ -66,6 +68,9 @@ public:
 		void shufflePlaylist() {
 			PlaylistIterator::shuffle = true;
 		}
+		void unshufflePlaylist() {
+			PlaylistIterator::shuffle = false;
+		}
 		bool operator==(PlaylistIterator const& i) const noexcept;
 		bool operator!=(PlaylistIterator const& i) const noexcept;
 		friend Playlist;
@@ -92,10 +97,11 @@ public:
 	unsigned int getDuration() const noexcept;
 	std::string formatDuration() const noexcept;
 	std::string getDescription() const noexcept;
-	void play() const noexcept;
+	void play() noexcept;
 	void shuffle() noexcept;
 	void unshuffle() noexcept;
 	void skip() noexcept;
+	void show() const noexcept;
 
 };
 
