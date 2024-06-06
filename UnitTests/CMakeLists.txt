@@ -39,3 +39,16 @@ target_link_libraries(PlaylistTest
     gtest_main
     Networking
 )
+
+add_executable(DatabaseTest DatabaseTest/DatabaseTest.cpp)
+
+target_include_directories(DatabaseTest
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/Networking
+)
+
+target_link_libraries(DatabaseTest
+    PRIVATE 
+    gtest_main
+    Networking
+)
