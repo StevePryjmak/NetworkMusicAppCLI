@@ -3,6 +3,7 @@
 
 int main(int argc, char* argv[]) {
     try {
+        createDirectories();
         TCPServer server {IPV::V4, 1337};
 
         server.OnJoin = [](TCPConnection::pointer connection) {

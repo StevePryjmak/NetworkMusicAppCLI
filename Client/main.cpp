@@ -12,11 +12,9 @@ int main(int argc, char* argv[]) {
     client.OnMessage = [&](const std::string& message) {
         std::cout << message;
         client.set_locked(false);
-        if (message == "logined\n") {
-            std::lock_guard<std::mutex> lk(client.get_mutex());
-            client.set_logined(true);
-            client.get_CV().notify_one();
-        }
+        if (message == "logined\n")  client.set_logined(true);
+        client.get_CV().notify_one();
+        std::lock_guard<std::mutex> lk(client.get_mutex());
     };
 
     client.OnDisconnect = []() {
@@ -91,11 +89,8 @@ int main(int argc, char* argv[]) {
             client.get_CV().wait(lk, [&client] { return !client.is_locked(); });
         }
 
-        if (client.is_logined()) {
+        if (client.is_logined()) 
             break;
-        } else {
-            std::cout << "Invalid username or password. Please try again." << std::endl;
-        }
     }
 
 //---------------------------------------------------------------------------------

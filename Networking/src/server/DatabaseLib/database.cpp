@@ -54,6 +54,8 @@ std::string restoreSpaces(const std::string& str)
 	return result;
 }
 
+
+
 bool PlaylistDataInterface::isValidNewName(const std::string& name, const std::string& login) const noexcept {
 	if (existName(name, login))
 		return false;
@@ -125,6 +127,16 @@ std::vector<std::string> PlaylistDataInterface::getPlalistsNames(const std::stri
 	return names;
 }
 
+
+std::vector<Playlist> PlaylistDataInterface::getPlaylists(const std::string& login) const
+{
+	std::vector<Playlist> playlists;
+	std::vector<std::string> names = getPlalistsNames(login);
+	for (const std::string& name : names) {
+		playlists.push_back(loadPlaylist(name, login));
+	}
+	return playlists;
+}
 /*
 * User
 * 
@@ -193,7 +205,8 @@ void UserDataInterface::addUser(const std::string& name, const std::string& logi
 	}
 	std::filesystem::create_directories("users/"+ replaceSpaces(login) + "/userPlaylists");
 	std::ofstream file("users/" + replaceSpaces(login)+"/credentials.txt");
-	if (!file.is_open())
+	std::ofstream favorite("users/" + replaceSpaces(login) + "/userPlaylists/" + "favorites"+ ".txt");
+	if (!file.is_open() || !favorite.is_open())
 	{
 		throw std::runtime_error("Unable to open file");
 	}

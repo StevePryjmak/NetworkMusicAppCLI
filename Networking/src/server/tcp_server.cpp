@@ -109,9 +109,14 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
         std::string username, password;
         ss >> username;
         ss >> password;
+        if(!users_db.validUserData(username, password)) {
+            connection->Post("Invalid username or password\n");
+            return;
+        }
         std::cout << username << " " << password << std::endl;
-        it->second = new User("User", username, password);
-
+        it->second = new User(users_db.getUserName(username), username, password);
+        it->second->load_playlists(playlists_db.getPlaylists(username));
+        it->second->load_favorites_playlist(playlists_db.loadPlaylist("favorites", username));
 
 
         const std::string& message1 = "logined\n";
@@ -122,14 +127,18 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
     }
 
     if(option == "Sign_in") {
-        // create new user (it must check if user exist from db)
         std::string name, username, password;
         ss >> name;
         ss >> username;
         ss >> password;
+        if (users_db.existLogin(username)) {
+            connection->Post("Username already exist\n");
+            return;
+        }
         std::cout << name << " " << username << " " << password << std::endl;
         it->second = new User(name, username, password);
-        users_db.addUser(username, password, name, 1);
+        users_db.addUser(name, username, password, 1);
+        
 
         const std::string& message1 = "logined\n";
         std::cout<< message1 <<std::endl;
@@ -172,9 +181,9 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
             user->execute_command<void()>(option);
         }
     }
-    else if(user->curent_menu == "playlists") {
+    else if(user->curent_menu == "playlists" && option != "back") {
+
         user->execute_command<std::string()>(option);
-        //user->output = user->playlists[std::stoi(option) - 1].getPlaylist();
     }
     else user->execute_command<void()>(option);
 

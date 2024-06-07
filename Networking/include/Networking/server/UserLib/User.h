@@ -8,6 +8,7 @@ protected:
     void initialize_commands() override {
         command_map.clear();
         curent_menu = "main";
+        output = "Main menu\n";
         add_function("1", "My_prifile", std::function<void()>(std::bind(&User::my_profile, this)));
         add_function("2", "Show Playlists", std::function<void()>(std::bind(&User::show_playlists, this)));
         add_function("3", "Favorites", std::function<void()>(std::bind(&User::favorites, this)));
@@ -33,6 +34,8 @@ public:
     User(const std::string& name, const std::string& login, const std::string& password);
 
     std::string get_option() override;
+    void load_playlists(std::vector<Playlist> playlists) override;
+    void load_favorites_playlist(Playlist favorite_playlist) override;
 
     void log_out() override {} // probably no needed
     void show_playlists() override;

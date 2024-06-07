@@ -35,6 +35,7 @@ public:
 	void deletePlaylist(const std::string& name, const std::string& login) const;
 	Playlist loadPlaylist(const std::string& name, const std::string& login) const;
 	std::vector<std::string> getPlalistsNames(const std::string& login) const;
+	std::vector<Playlist> getPlaylists(const std::string& login) const;
 };	
 
 class UserDataInterface {

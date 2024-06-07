@@ -23,13 +23,12 @@ protected:
     std::string name;
     std::string login;
     std::string password;
-
-    Playlist* favorites_playlist;
+    std::vector<Playlist> playlists;
+    Playlist favorite_playlist;
 
     std::map<std::string, FunctionHolder> command_map;
     void virtual initialize_commands() = 0;
 public:
-    std::vector<Playlist> playlists;
     virtual ~VirtualUser() = default;
 
     virtual std::string get_option() = 0;
@@ -43,6 +42,8 @@ public:
 
     virtual void become_artist_feedback() = 0;
     virtual void become_artist(VirtualUser*& user_pointer) = 0;
+    virtual void load_playlists(std::vector<Playlist> playlists) = 0;
+    virtual void load_favorites_playlist(Playlist favorite_playlist) = 0;
 
     std::string output;
     std::string curent_menu;

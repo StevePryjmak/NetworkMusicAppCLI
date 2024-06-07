@@ -28,6 +28,7 @@ private:
     std::optional<boost::asio::ip::tcp::socket> socket;
     std::vector<std::pair<TCPConnection::pointer, VirtualUser*>> connections;
     UserDataInterface users_db;
+    PlaylistDataInterface playlists_db;
     void start_accept();
 
 public:

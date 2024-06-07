@@ -28,6 +28,14 @@ std::string User::get_option() {
     return option;
 }
 
+void User::load_playlists(std::vector<Playlist> playlists) {
+    this->playlists = playlists;
+}
+
+void User::load_favorites_playlist(Playlist favorite_playlist) {
+    this->favorite_playlist = favorite_playlist;
+}
+
 std::string User::my_profile() {
     output = "My profile:\n";
     output += "username: " + name + "\nlogin: " + login + "\n";
