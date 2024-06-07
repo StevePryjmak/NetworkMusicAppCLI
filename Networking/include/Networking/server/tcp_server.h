@@ -4,6 +4,7 @@
 #include <Networking/server/UserLib/User.h>
 #include <Networking/server/UserLib/Admin.h>
 #include <Networking/server/UserLib/Artist.h>
+#include <Networking/server/UserLib/AdminArtist.h>
 #include <Networking/server/DatabaseLib/database.h>
 #include <boost/asio.hpp>
 #include <unordered_set>

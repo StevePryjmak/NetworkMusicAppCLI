@@ -22,7 +22,10 @@ public:
 	Song loadSong(unsigned int id) const;
 	std::vector<unsigned int> getSongsIds() const noexcept;
 	unsigned int getRandomSongId() const;
+	unsigned int getRandomSongId(std::string genre) const;  // this and priwiouse function should be merged
 	unsigned int getNextIdAndIncrement() noexcept;
+	bool songExists(std::string name) const noexcept;
+	Song loadSong(std::string name) const;
 };
 
 
@@ -36,6 +39,9 @@ public:
 	Playlist loadPlaylist(const std::string& name, const std::string& login) const;
 	std::vector<std::string> getPlalistsNames(const std::string& login) const;
 	std::vector<Playlist> getPlaylists(const std::string& login) const;
+	Playlist getRandomPlaylist(const std::string& login, int songs_number); // also saves in the database
+	Playlist getRandomPlaylist(const std::string& login, int songs_number, std::string genre); // this and priwiouse function should be merged
+	bool playlistExists(const std::string& name, const std::string& login) const noexcept;
 };	
 
 class UserDataInterface {
@@ -47,6 +53,7 @@ private:
 public:
 	void addUser(const std::string& name, const std::string& login, const std::string& password, unsigned int privilageLevel) const;
 	void deleteUser(const std::string& login) const;
+	unsigned int getAccessLevel(const std::string& login) const;
 	void changeAccessLevel(const std::string& login, int newAccessLevel) const;
 	bool validUserData(const std::string& login, const std::string& password) const noexcept;
 	bool existLogin(const std::string& login) const noexcept;

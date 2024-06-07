@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
         std::cout << message;
         client.set_locked(false);
         if (message == "logined\n")  client.set_logined(true);
+        if (message == "logged_out\n") client.set_logined(false);
         client.get_CV().notify_one();
         std::lock_guard<std::mutex> lk(client.get_mutex());
     };
@@ -89,22 +90,21 @@ int main(int argc, char* argv[]) {
             client.get_CV().wait(lk, [&client] { return !client.is_locked(); });
         }
 
-        if (client.is_logined()) 
-            break;
+
+
+        while (true && client.is_logined()) {
+            std::string message;
+            std::getline(std::cin, message);
+
+            if (message == "\\q" || disconnected) break;
+            message += "\n";
+            system("cls");
+            client.Post(message + " \n");
+            std::cout << "Waiting for server responce" << std::endl;
+        }
     }
 
 //---------------------------------------------------------------------------------
-
-    while (true) {
-        std::string message;
-        std::getline(std::cin, message);
-
-        if (message == "\\q" || disconnected) break;
-        message += "\n";
-        system("cls");
-        client.Post(message + " \n");
-        std::cout << "Waiting for server responce" << std::endl;
-    }
 
     client.stop();
     t.join();

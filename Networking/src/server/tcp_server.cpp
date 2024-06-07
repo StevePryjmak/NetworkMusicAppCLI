@@ -114,7 +114,27 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
             return;
         }
         std::cout << username << " " << password << std::endl;
-        it->second = new User(users_db.getUserName(username), username, password);
+
+
+        
+        switch (users_db.getAccessLevel(username)) {
+            case 3:
+                //it->second = new AdminArtist(users_db.getUserName(username), username, password);// TODO: implement constructor
+                break;
+            case 2:
+                it->second = new Artist(users_db.getUserName(username), username, password);
+                //it->second-> // TODO: load artist songs playlist
+                break;
+            case 1:
+                it->second = new User(users_db.getUserName(username), username, password);
+                break;
+            case 0:
+                it->second = new Admin(users_db.getUserName(username), username, password);
+                break;
+            default:
+
+                break;
+        }
         it->second->load_playlists(playlists_db.getPlaylists(username));
         it->second->load_favorites_playlist(playlists_db.loadPlaylist("favorites", username));
 
@@ -156,30 +176,39 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
     }
 
     if(user->curent_menu == "main") {
-        if (option == "7") {
-            std::string argument1;
-            ss >> argument1;
-            user->execute_command<void(std::string)>(option, argument1);
-        }
-        else if (option == "4") {
-            //user->become_artist(it->second); // debug it letter
+        if (option == "05") {
             user->execute_command<void()>(option);
-            user->output = "Need to be debuged\n";
+            connection->Post(user->output + "\n");
+            it->second = nullptr;
+            return;
         }
-        else if (option == "11" && admin != nullptr) {
+        if (option == "06") {
+            int argument1;
+            ss >> argument1;
+            user->execute_command<void(int)>(option, argument1);
+        }
+        else if (option == "07" || option == "08" || option == "09" || (option == "14" && admin != nullptr) || 
+                 (option == "12" && artist != nullptr)) {
             std::string argument1;
             ss >> argument1;
+            if(argument1 == "") {
+                connection->Post("This function requeres input\n");
+                return;
+            }
             user->execute_command<void(std::string)>(option, argument1);
         }
-        else if(option == "9" && artist != nullptr) { // this and priwious could be done in one if
-            std::string argument1;
+        else if (option == "10") {
+            std::string argument1, argument2;
             ss >> argument1;
-            user->execute_command<void(std::string)>(option, argument1);
+            ss >> argument2;
+            if(argument1 == "" || argument2 == "") {
+                connection->Post("This function requeres input\n");
+                return;
+            }
+            user->execute_command<void(std::string, std::string)>(option, argument1, argument2);
         }
         else
-        {
             user->execute_command<void()>(option);
-        }
     }
     else if(user->curent_menu == "playlists" && option != "back") {
 

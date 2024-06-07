@@ -137,6 +137,40 @@ std::vector<Playlist> PlaylistDataInterface::getPlaylists(const std::string& log
 	}
 	return playlists;
 }
+
+Playlist PlaylistDataInterface::getRandomPlaylist(const std::string& login, int songs_number)
+{
+	Playlist pl = Playlist("Random");
+	for (int i = 0; i < songs_number; i++) {
+		pl.addToPlaylist(loadSong(getRandomSongId()));
+	}
+	savePlaylist(pl, login);
+	return pl;
+}
+
+Playlist PlaylistDataInterface::getRandomPlaylist(const std::string& login, int songs_number, std::string genre)
+{
+	if(genre.empty())
+		return getRandomPlaylist(login, songs_number);
+	Playlist pl = Playlist("Random_"+ genre);
+	for (int i = 0; i < songs_number; i++) {
+		pl.addToPlaylist(loadSong(getRandomSongId(genre)));
+	}
+	savePlaylist(pl, login);
+	return pl;
+}
+
+bool PlaylistDataInterface::playlistExists(const std::string& name, const std::string& login) const noexcept
+{
+	std::ifstream file("users/" + replaceSpaces(login) + "/userPlaylists/" + replaceSpaces(name)+ ".txt");
+	if (file.is_open())
+	{
+		file.close();
+		return true;
+	}
+	else
+		return false;
+}
 /*
 * User
 * 
@@ -240,6 +274,25 @@ void UserDataInterface::changeAccessLevel(const std::string& login, int newAcces
 	}
 	ofile<<pass<<" "<<name<<" "<<newAccessLevel<<std::endl;
 	ofile.close();
+}
+
+unsigned int UserDataInterface::getAccessLevel(const std::string& login) const {
+	if (!existLogin(login)){
+		throw std::runtime_error("Invalid login");
+	}
+	std::ifstream file("users/" + replaceSpaces(login)+"/credentials.txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	std::string pass;
+	file>>pass;
+	std::string name;
+	file>>name;
+	unsigned int accessLevel;
+	file>>accessLevel;
+	file.close();
+	return accessLevel;
 }
 
 bool UserDataInterface::validUserData(const std::string& login, const std::string& password) const noexcept
@@ -357,10 +410,34 @@ Song SongDataInterface::loadSong(unsigned int id) const
 	return s;
 }
 
+Song SongDataInterface::loadSong(std::string name) const
+{
+	for (unsigned int id : getSongsIds())
+	{
+		Song s = loadSong(id);
+		if (s.getName() == name)
+			return s;
+	}
+	throw std::runtime_error("Song not found");
+}
+
 unsigned int SongDataInterface::getRandomSongId() const
 {
 	std::vector<unsigned int> ids = getSongsIds();
 	return ids[rand()%ids.size()];
+}
+
+unsigned int SongDataInterface::getRandomSongId(std::string genre) const
+{
+	std::vector<unsigned int> ids = getSongsIds();
+	std::vector<unsigned int> genreIds;
+	for (unsigned int id : ids)
+	{
+		Song s = loadSong(id);
+		if (s.getGenre() == genre)
+			genreIds.push_back(id);
+	}
+	return genreIds[rand()%genreIds.size()];
 }
 
 unsigned int SongDataInterface::getNextIdAndIncrement() noexcept
@@ -380,6 +457,14 @@ std::vector<unsigned int> SongDataInterface::getSongsIds() const noexcept
         ids.push_back(std::stoi(entry.path().stem().string()));
     }
 	return ids;
+}
+
+bool SongDataInterface::songExists(std::string name) const noexcept
+{
+	for (unsigned int id : getSongsIds())
+		if (loadSong(id).getName() == name)
+			return true;
+	return false;
 }
 
 void createDirectories() noexcept

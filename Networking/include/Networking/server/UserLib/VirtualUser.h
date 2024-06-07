@@ -7,6 +7,7 @@
 #include <tuple>
 #include <map>
 #include <Networking/server/SongLib/Playlist.h>
+#include <Networking/server/DatabaseLib/database.h>
 #include <type_traits>
 #include <any>
 #include <cstdarg>
@@ -34,14 +35,15 @@ public:
     virtual std::string get_option() = 0;
     virtual void log_out() = 0;
     virtual void show_playlists() = 0;
-    virtual void generate_random_playlist() = 0;
+    virtual void generate_random_playlist(int number_of_songs) = 0;
     virtual void favorites() = 0;
     virtual void add_favorite_song(std::string name) = 0;
     virtual std::string my_profile() = 0;
     virtual  void delete_playlist(std::string palylist_name) = 0;
+    virtual void create_playlist(std::string playlist_name) = 0;
+    virtual void add_song_to_playlist(std::string playlist_name, std::string song_name) = 0;
 
-    virtual void become_artist_feedback() = 0;
-    virtual void become_artist(VirtualUser*& user_pointer) = 0;
+    virtual void become_artist() = 0;
     virtual void load_playlists(std::vector<Playlist> playlists) = 0;
     virtual void load_favorites_playlist(Playlist favorite_playlist) = 0;
 
@@ -56,8 +58,6 @@ public:
             auto func = std::any_cast<std::function<Func>>(holder.function);
             if constexpr (std::is_same_v<std::invoke_result_t<std::function<Func>, Args...>, std::string>) {
                 output = func(std::forward<Args>(args)...);
-                std::cout << output;
-                std::cout << "i'm here" << std::endl;
             } else {
                 func(std::forward<Args>(args)...);
             }
