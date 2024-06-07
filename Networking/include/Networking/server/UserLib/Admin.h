@@ -5,10 +5,12 @@
 class Admin : public User {
 protected:
     void initialize_commands() override{
+        command_map.clear();
+        curent_menu = "main";
         add_function("1", "My_prifile", std::function<void()>(std::bind(&Admin::my_profile, this)));
         add_function("2", "Show Playlists", std::function<void()>(std::bind(&Admin::show_playlists, this)));
         add_function("3", "Favorites", std::function<void()>(std::bind(&Admin::favorites, this)));
-        add_function("4", "Become Artist", std::function<void()>(std::bind(&Admin::become_artist, this)));
+        add_function("4", "Become Artist", std::function<void()>(std::bind(&Admin::become_artist_feedback, this)));
         add_function("5", "Log Out", std::function<void()>(std::bind(&Admin::log_out, this)));              // could be removed later
         add_function("6", "Generate Random Playlist", std::function<void()>(std::bind(&Admin::generate_random_playlist, this)));
         add_function("7", "Delete Playlist", std::function<void(std::string)>(std::bind(&Admin::delete_playlist, this, std::placeholders::_1)));

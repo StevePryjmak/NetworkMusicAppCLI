@@ -66,9 +66,21 @@ int main(int argc, char* argv[]) {
             client.Post("Log_in " + username + " " + password + "\n");
 
         } else if (option == 2) {
-            // Code for sign in
-            std::cout << "Sign in selected" << std::endl; 
-            std::terminate(); // --- implement this later
+            std::string name;
+            std::string username;
+            std::string password;
+
+            std::cout << "Enter your name: ";
+            std::cin >> name;
+
+            std::cout << "Enter your username: ";
+            std::cin >> username;
+
+            std::cout << "Enter your password: ";
+            std::cin >> password;
+
+            client.set_locked(true);
+            client.Post("Sign_in " + name + " " + username + " " + password + "\n");
         } else {
             std::cout << "Invalid option selected" << std::endl;
             continue;
