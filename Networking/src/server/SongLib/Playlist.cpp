@@ -1,21 +1,23 @@
 #include <Networking/server/SongLib/Playlist.h>
 
+
 void Playlist::addToPlaylist(Song song) noexcept
 {
 	Playlist::playlist.push_back(song);
 	Playlist::duration += song.getDuration();
+	current = begin();
 }
 
 Playlist::PlaylistIterator Playlist::begin() const
 {
-	return PlaylistIterator(playlist.begin(), this);
+	return PlaylistIterator(playlist.cbegin(), this);
 }
 
 Playlist::PlaylistIterator Playlist::deleteFromPlaylist(PlaylistIterator i)
 {
 	Playlist::duration -= (*i).getDuration();
-	std::vector<Song>::const_iterator j = Playlist::playlist.erase(i.curr);
-	return PlaylistIterator(j, this, i.shuffle);
+	Playlist::playlist.erase(i.curr);
+	return begin();
 }
 
 Playlist::PlaylistIterator Playlist::deleteFromPlaylist(unsigned int i)
@@ -26,9 +28,13 @@ Playlist::PlaylistIterator Playlist::deleteFromPlaylist(unsigned int i)
 
 Playlist::PlaylistIterator Playlist::end() const
 {
-	return PlaylistIterator(playlist.end(), this);
+	return PlaylistIterator(playlist.cend(), this);
 }
 
+Song Playlist::getCurrent()
+{
+    return *current;
+}
 Playlist::Playlist(std::string name)
 {
 	Playlist::name = name;
@@ -44,11 +50,12 @@ std::string Playlist::getPlaylist() const noexcept
 	std::string description = "";
 	unsigned int count = 1;
 	PlaylistIterator i = begin();
-	while (i != end()) {
+	while (i != Playlist::end()) {
 		description += (std::to_string(count) + ". ");
 		description += (*i).getDescription();
 		description += "\n";
-		count++;
+		++i;
+		++count;
 	}
 	return description;
 }
@@ -96,19 +103,33 @@ void Playlist::unshuffle() noexcept
 void Playlist::skip() noexcept
 {
 	++current;
-	std::cout << (*current).getDescription() << "\n";
+	if (current == end())
+		std::cout << "Playlist ended\n";
+	else
+		std::cout << (*current).getDescription() << "\n";
 }
 
 void Playlist::show() const noexcept
 {
 	std::cout << getPlaylist();
 }
+
+ void Playlist::deleteSong(unsigned int i)
+{
+	current = deleteFromPlaylist(i-1);
+}
+
+/*void Playlist::addSong(Song song) noexcept
+{
+	current = addToPlaylist(song);
+}*/
+
 bool Playlist::PlaylistIterator::operator==(PlaylistIterator const& i) const noexcept
 {
-	return curr == curr;
+	return curr == i.curr;
 }
 
 bool Playlist::PlaylistIterator::operator!=(PlaylistIterator const& i) const noexcept
 {
-	return curr != curr;
+	return curr != i.curr;
 }
