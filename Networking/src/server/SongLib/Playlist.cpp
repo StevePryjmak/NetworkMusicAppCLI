@@ -10,7 +10,7 @@ void Playlist::addToPlaylist(Song song) noexcept
 
 Playlist::PlaylistIterator Playlist::begin() const
 {
-	return PlaylistIterator(playlist.begin(), this);
+	return PlaylistIterator(playlist.cbegin(), this);
 }
 
 Playlist::PlaylistIterator Playlist::deleteFromPlaylist(PlaylistIterator i)
@@ -28,7 +28,7 @@ Playlist::PlaylistIterator Playlist::deleteFromPlaylist(unsigned int i)
 
 Playlist::PlaylistIterator Playlist::end() const
 {
-	return PlaylistIterator(playlist.end(), this);
+	return PlaylistIterator(playlist.cend(), this);
 }
 
 Song Playlist::getCurrent()
@@ -50,11 +50,12 @@ std::string Playlist::getPlaylist() const noexcept
 	std::string description = "";
 	unsigned int count = 1;
 	PlaylistIterator i = begin();
-	while (i != end()) {
+	while (i != Playlist::end()) {
 		description += (std::to_string(count) + ". ");
 		description += (*i).getDescription();
 		description += "\n";
-		count++;
+		++i;
+		++count;
 	}
 	return description;
 }
@@ -125,10 +126,10 @@ void Playlist::show() const noexcept
 
 bool Playlist::PlaylistIterator::operator==(PlaylistIterator const& i) const noexcept
 {
-	return curr == curr;
+	return curr == i.curr;
 }
 
 bool Playlist::PlaylistIterator::operator!=(PlaylistIterator const& i) const noexcept
 {
-	return curr != curr;
+	return curr != i.curr;
 }

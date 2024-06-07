@@ -32,7 +32,7 @@ public:
 	class PlaylistIterator {
 		std::vector<Song>::const_iterator curr;
 		bool shuffle;
-		Playlist const* pl;
+		Playlist const * pl;
 	public:
 		PlaylistIterator& operator++() {
 			if (curr == pl->playlist.end())

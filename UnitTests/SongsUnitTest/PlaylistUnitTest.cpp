@@ -47,6 +47,18 @@ TEST(PlaylistTestAddToPlaylist, AddToPlaylistMoreSongs) {
 	EXPECT_EQ((*(++i)).getDescription(), "The Sun Always Shines On T.V. | a-ha | 5:02");
 }
 
+TEST(PlaylistGetPlaylist, PlaylistNotEmpty) {
+	Playlist p("MyPlaylist");
+	EXPECT_EQ(p.getName(), "MyPlaylist");
+	EXPECT_EQ(p.getDuration(), 0);
+	EXPECT_EQ(p.formatDuration(), "0:00");
+	Song s(1, "Black Celebration", "Depeche Mode", "Synth pop", 297, 1986);
+	Song s1(2, "The Last Imagination", "Dark Tranquillity", "Death metal", 227);
+	p.addToPlaylist(s);
+	p.addToPlaylist(s1);
+	EXPECT_EQ(p.getPlaylist(), "1. Black Celebration | Depeche Mode | 4:57\n2. The Last Imagination | Dark Tranquillity | 3:47\n");
+}
+
 TEST(PlaylistTestAddToPlaylist, AddSongCurrentTest) {
 	Playlist p("MyPlaylist");
 	EXPECT_EQ(p.getName(), "MyPlaylist");
