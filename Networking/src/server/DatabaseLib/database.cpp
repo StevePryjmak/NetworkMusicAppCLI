@@ -22,6 +22,8 @@
 * | |-|songs
 * | | |
 * | | |-|{songId.txt}
+* |
+* |id.txt
 */
 
 /*
@@ -111,6 +113,18 @@ Playlist PlaylistDataInterface::loadPlaylist(const std::string& name,const std::
 	return pl;
 }
 
+std::vector<std::string> PlaylistDataInterface::getPlalistsNames(const std::string& login) const
+{
+	std::vector<std::string> names;
+	if (std::filesystem::is_empty("users/"+login+"/userPlaylists"))
+		return names;
+	for (const auto& entry : std::filesystem::directory_iterator("users/"+login+"/userPlaylists")) 
+	{
+        names.push_back(restoreSpaces(entry.path().stem().string()));
+    }
+	return names;
+}
+
 /*
 * User
 * 
@@ -140,7 +154,7 @@ bool UserDataInterface::isValidPassword(const std::string& password) const noexc
 }
 
 bool UserDataInterface::existLogin(const std::string& login) const noexcept {
-	std::ofstream file("users/" + replaceSpaces(login)+"/credentials.txt");
+	std::ifstream file("users/" + replaceSpaces(login)+"/credentials.txt");
 	if (file.is_open())
 	{
 		file.close();
@@ -186,6 +200,7 @@ void UserDataInterface::addUser(const std::string& name, const std::string& logi
 	file<<password<<" "<<replaceSpaces(name)<<" "<<privilageLevele<<std::endl;
 	file.close();
 }
+
 void UserDataInterface::deleteUser(const std::string& login) const {
 	if (!std::filesystem::remove("users/" + replaceSpaces(login)+"/credentials.txt"))
 		throw std::runtime_error("Unable to delete file");
@@ -214,12 +229,67 @@ void UserDataInterface::changeAccessLevel(const std::string& login, int newAcces
 	ofile.close();
 }
 
+bool UserDataInterface::validUserData(const std::string& login, const std::string& password) const noexcept
+{
+	std::ifstream file("users/" + replaceSpaces(login) +"/credentials.txt");
+	if (!file.is_open())
+	{
+		return false;
+	}
+	std::string pass;
+	file>>pass;
+	file.close();
+	return pass==password;
+}
+
+std::string UserDataInterface::getUserName(const std::string& login) const
+{
+	std::ifstream file("users/" + replaceSpaces(login)+"/credentials.txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	std::string name;
+	file>>name;
+	file>>name;
+	file.close();
+	return name;
+}
+
 /*
 * Song
 * 
 * info.txt
 *	{name} {artist} {genre} {duration} {year}
 */
+unsigned int SongDataInterface::nextId;
+
+SongDataInterface::SongDataInterface()
+{
+	loadNextId();
+}
+
+void SongDataInterface::loadNextId()
+{
+	std::ifstream file("id.txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	file>>SongDataInterface::nextId;
+	file.close();
+}
+	
+void SongDataInterface::saveNextId() const
+{
+	std::ofstream file("id.txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	file<<SongDataInterface::nextId;
+	file.close();
+}
 
 bool SongDataInterface::existId(unsigned int id) const noexcept
 {
@@ -274,7 +344,46 @@ Song SongDataInterface::loadSong(unsigned int id) const
 	return s;
 }
 
+unsigned int SongDataInterface::getRandomSongId() const
+{
+	std::vector<unsigned int> ids = getSongsIds();
+	return ids[rand()%ids.size()];
+}
+
+unsigned int SongDataInterface::getNextIdAndIncrement() noexcept
+{
+	unsigned int tmp = SongDataInterface::nextId++;
+	saveNextId();
+	return tmp;
+}
+
+std::vector<unsigned int> SongDataInterface::getSongsIds() const noexcept
+{
+	std::vector<unsigned int> ids;
+	if (std::filesystem::is_empty("public/songs"))
+		return ids;
+	for (const auto& entry : std::filesystem::directory_iterator("public/songs")) 
+	{
+        ids.push_back(std::stoi(entry.path().stem().string()));
+    }
+	return ids;
+}
+
+void createDirectories() noexcept
+{
+	std::filesystem::create_directories("public/songs");
+	std::filesystem::create_directories("users");
+	std::ifstream f("id.txt");
+	if (!f.is_open())
+	{
+		std::ofstream file("id.txt");
+		file<<"1"<<std::endl;
+	}
+	f.close();
+}
+
 std::string generateHash(const std::string& password) noexcept 
 {
 	return password;
 }
+
