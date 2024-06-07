@@ -1,3 +1,4 @@
+
 #include <Networking/server/tcp_server.h>
 
 #include <iostream>
@@ -28,10 +29,9 @@ void TCPServer::Broadcast(const std::string &message) {
 void TCPServer::start_accept() {
     socket.emplace(io_context);
 
-    // Asynchronously accept the connection
     acceptor.async_accept(*socket, [this](const boost::system::error_code& error) {
         if (!error) {
-            // Create a new TCP connection
+
             auto connection = TCPConnection::Create(std::move(*socket));
             auto user = nullptr;//new VirtualUser("User"); // Initialize user class, customize as needed
 
@@ -62,11 +62,8 @@ void TCPServer::start_accept() {
                 }
             );
         } else {
-            // Log the error or handle it as necessary
-            std::cerr << "Accept error: " << error.message() << std::endl;
+            std::cout << "Accept error: " << error.message() << std::endl;
         }
-
-        // Start accepting the next connection
         start_accept();
     });
 }
@@ -113,9 +110,26 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
         ss >> username;
         ss >> password;
         std::cout << username << " " << password << std::endl;
-        it->second = new Artist("User", username, password);
+        it->second = new User("User", username, password);
 
 
+
+        const std::string& message1 = "logined\n";
+        std::cout<< message1 <<std::endl;
+        connection->Post(message1);
+        connection->Post("Chose opthin: \n" + it->second->get_option()); // + "\n"
+        return;
+    }
+
+    if(option == "Sign_in") {
+        // create new user (it must check if user exist from db)
+        std::string name, username, password;
+        ss >> name;
+        ss >> username;
+        ss >> password;
+        std::cout << name << " " << username << " " << password << std::endl;
+        it->second = new User(name, username, password);
+        users_db.addUser(username, password, name, 1);
 
         const std::string& message1 = "logined\n";
         std::cout<< message1 <<std::endl;
@@ -127,31 +141,42 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
     auto user = it->second;
     Admin* admin = dynamic_cast<Admin*>(user);
     Artist* artist = dynamic_cast<Artist*>(user); // maybe it will be neded later
-
     if (user == nullptr) {
         connection->Post("You must log in first\n");
         return;
     }
 
-    if (option == "7") {
-        std::string argument1;
-        ss >> argument1;
-        user->execute_command<void(std::string)>(option, argument1);
+    if(user->curent_menu == "main") {
+        if (option == "7") {
+            std::string argument1;
+            ss >> argument1;
+            user->execute_command<void(std::string)>(option, argument1);
+        }
+        else if (option == "4") {
+            //user->become_artist(it->second); // debug it letter
+            user->execute_command<void()>(option);
+            user->output = "Need to be debuged\n";
+        }
+        else if (option == "11" && admin != nullptr) {
+            std::string argument1;
+            ss >> argument1;
+            user->execute_command<void(std::string)>(option, argument1);
+        }
+        else if(option == "9" && artist != nullptr) { // this and priwious could be done in one if
+            std::string argument1;
+            ss >> argument1;
+            user->execute_command<void(std::string)>(option, argument1);
+        }
+        else
+        {
+            user->execute_command<void()>(option);
+        }
     }
-    if (option == "11" && admin != nullptr) {
-        std::string argument1;
-        ss >> argument1;
-        user->execute_command<void(std::string)>(option, argument1);
+    else if(user->curent_menu == "playlists") {
+        user->execute_command<std::string()>(option);
+        //user->output = user->playlists[std::stoi(option) - 1].getPlaylist();
     }
-    if(option == "9" && artist != nullptr) { // this and priwious could be done in one if
-        std::string argument1;
-        ss >> argument1;
-        user->execute_command<void(std::string)>(option, argument1);
-    }
-    else
-    {
-        user->execute_command<void()>(option);
-    }
+    else user->execute_command<void()>(option);
 
 
 

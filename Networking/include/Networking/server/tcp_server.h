@@ -4,6 +4,7 @@
 #include <Networking/server/UserLib/User.h>
 #include <Networking/server/UserLib/Admin.h>
 #include <Networking/server/UserLib/Artist.h>
+#include <Networking/server/DatabaseLib/database.h>
 #include <boost/asio.hpp>
 #include <unordered_set>
 #include <optional>
@@ -26,6 +27,7 @@ private:
     boost::asio::ip::tcp::acceptor  acceptor;
     std::optional<boost::asio::ip::tcp::socket> socket;
     std::vector<std::pair<TCPConnection::pointer, VirtualUser*>> connections;
+    UserDataInterface users_db;
     void start_accept();
 
 public:
