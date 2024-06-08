@@ -43,6 +43,8 @@ public:
     virtual  void delete_playlist(std::string palylist_name) = 0;
     virtual void create_playlist(std::string playlist_name) = 0;
     virtual void add_song_to_playlist(std::string playlist_name, std::string song_name) = 0;
+    virtual void show_songs_from_database() = 0;
+    virtual void help() = 0;
 
     virtual void become_artist() = 0;
     virtual void load_playlists(std::vector<Playlist> playlists) = 0;
@@ -52,28 +54,39 @@ public:
     std::string curent_menu;
 
 
-    template <typename Func, typename... Args> // It is posible to add return type typename ReturnType but not realy needed
-    std::string execute_command(int key, Args... args) {
-        try {
-            auto& holder = command_map.at(key);
-            auto func = std::any_cast<std::function<Func>>(holder.function);
-            if constexpr (std::is_same_v<std::invoke_result_t<std::function<Func>, Args...>, std::string>) {
-                output = func(std::forward<Args>(args)...);
-            } else {
-                func(std::forward<Args>(args)...);
-            }
-        } catch (const std::bad_any_cast& e) {
-            std::cout << "Bad any cast: " << e.what() << std::endl;
-        } catch (const std::out_of_range&) {
-            std::cout << "Function not found: " << name << std::endl;
-            output = "Input valid command\n";
-        }
-        return output;
-    }
-
+    template <typename Func, typename... Args>
+    std::string execute_command(int key, Args... args);
 
     template <typename Func>
-    void add_function(int key, const std::string& description, Func func) {
-        command_map[key] = FunctionHolder{description, std::function(func)};
-    }
+    void add_function(int key, const std::string& description, Func func);
 };
+
+
+
+
+
+
+template <typename Func, typename... Args> // It is posible to add return type typename ReturnType but not realy needed
+std::string VirtualUser::execute_command(int key, Args... args) {
+    try {
+        auto& holder = command_map.at(key);
+        auto func = std::any_cast<std::function<Func>>(holder.function);
+        if constexpr (std::is_same_v<std::invoke_result_t<std::function<Func>, Args...>, std::string>) {
+            output = func(std::forward<Args>(args)...);
+        } else {
+            func(std::forward<Args>(args)...);
+        }
+    } catch (const std::bad_any_cast& e) {
+        std::cout << "Bad any cast: " << e.what() << std::endl;
+    } catch (const std::out_of_range&) {
+        std::cout << "Function not found: " << name << std::endl;
+        output = "Input valid command\n";
+    }
+    return output;
+}
+
+
+template <typename Func>
+void VirtualUser::add_function(int key, const std::string& description, Func func) {
+    command_map[key] = FunctionHolder{description, std::function(func)};
+}
