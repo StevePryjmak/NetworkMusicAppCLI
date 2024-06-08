@@ -14,12 +14,12 @@ FetchContent_MakeAvailable(googletest)
 add_executable(SongUnitTest SongsUnitTest/SongUnitTest.cpp)
 
 target_include_directories(SongUnitTest
-    PUBLIC 
+    PUBLIC
     ${CMAKE_SOURCE_DIR}/Networking
 )
 
 target_link_libraries(SongUnitTest
-    PRIVATE 
+    PRIVATE
     gtest_main
     Networking
 )
@@ -30,12 +30,12 @@ enable_testing()
 add_executable(PlaylistTest SongsUnitTest/PlaylistUnitTest.cpp)
 
 target_include_directories(PlaylistTest
-    PUBLIC 
+    PUBLIC
     ${CMAKE_SOURCE_DIR}/Networking
 )
 
 target_link_libraries(PlaylistTest
-    PRIVATE 
+    PRIVATE
     gtest_main
     Networking
 )
@@ -43,12 +43,26 @@ target_link_libraries(PlaylistTest
 add_executable(DatabaseTest DatabaseTest/DatabaseTest.cpp)
 
 target_include_directories(DatabaseTest
-    PUBLIC 
+    PUBLIC
     ${CMAKE_SOURCE_DIR}/Networking
 )
 
 target_link_libraries(DatabaseTest
-    PRIVATE 
+    PRIVATE
+    gtest_main
+    Networking
+)
+
+
+add_executable(UserTest UserUnitTest/UserUnitTest.cpp)
+
+target_include_directories(UserTest
+    PUBLIC
+    ${CMAKE_SOURCE_DIR}/Networking
+)
+
+target_link_libraries(UserTest
+    PRIVATE
     gtest_main
     Networking
 )
