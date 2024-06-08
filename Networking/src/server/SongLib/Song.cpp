@@ -4,11 +4,11 @@
 Song::Song(unsigned int id, std::string name, std::string artist, std::string genre, unsigned int duration, unsigned int year)
 {
 	Song::id = id;
-	if (not name.length()) {
+	if (!name.length()) {
 		throw std::invalid_argument("Name cannot be empty");
 	}
 	Song::name = name;
-	if (not artist.length()) {
+	if (!artist.length()) {
 		throw std::invalid_argument("Artist cannot be empty");
 	}
 	Song::artist = artist;
@@ -27,12 +27,24 @@ std::string Song::getArtist() const noexcept
 	return Song::artist;
 }
 
+std::string Song::getLyrics() const noexcept
+{
+	if(!(Song::lyrics).length())
+		return "Sorry, we don't know the lyrics.";
+	return Song::lyrics;
+}
+
+void Song::addLyrics(std::string lyrics) noexcept
+{
+	Song::lyrics = lyrics;
+}
+
 /*void Song::addToPlaylist(Playlist p)
 {
 	p.addToPlaylist(*this);
 }*/
 
-std::string Song::getGenre() const noexcept 
+std::string Song::getGenre() const noexcept
 {
 	return Song::genre;
 }

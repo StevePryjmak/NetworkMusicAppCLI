@@ -3,11 +3,14 @@
 #include "VirtualUser.h"
 
 
-class User : public VirtualUser {
+class User : public virtual VirtualUser {
 protected:
     void initialize_commands() override;
 
     void initialize_playlist_map();
+    void initialize_playlist_options(Playlist &playlist);
+    void initialize_songs_map(Playlist &playlist);
+
 public:
     User(const std::string& name, const std::string& login, const std::string& password);
 
@@ -27,7 +30,9 @@ public:
     void add_song_to_playlist(std::string playlist_name, std::string song_name) override;
 
     void become_artist() override;
-
+    void show_songs_from_database() override;
+    void show_songs_from_datbase_privious() override;
+    void help() override;
 };
 
 

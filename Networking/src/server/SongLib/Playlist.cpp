@@ -40,6 +40,7 @@ Song Playlist::getCurrent()
 }
 Playlist::Playlist(std::string name)
 {
+	current = begin();
 	Playlist::name = name;
 }
 
@@ -110,8 +111,8 @@ void Playlist::skip() noexcept
 {
 	++current;
 	if (current == end()){
-		std::cout << "Playlist ended\n";
 		current = begin();
+		std::cout << "Playlist ended, Starting form beginig\n";
 	}
 	else
 		std::cout << (*current).getDescription() << "\n";

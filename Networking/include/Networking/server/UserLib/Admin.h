@@ -2,7 +2,7 @@
 #include "User.h"
 
 
-class Admin : public User {
+class Admin : public virtual User {
 protected:
     void initialize_commands() override;
 

@@ -1,34 +1,60 @@
 #include <Networking/server/UserLib/User.h>
 #include <Networking/server/UserLib/Artist.h>
 #include <iostream>
+#include <algorithm>
 
 
 void User::initialize_commands() {
     command_map.clear();
     curent_menu = "main";
     output = "Main menu\n";
-    add_function(10, "Add Song to Playlist (Input playlist name and song name)", std::function<void(std::string, std::string)>(std::bind(&User::add_song_to_playlist, this, std::placeholders::_1, std::placeholders::_2)));
     add_function(1, "My_prifile", std::function<void()>(std::bind(&User::my_profile, this)));
     add_function(2, "Show Playlists", std::function<void()>(std::bind(&User::show_playlists, this)));
     add_function(3, "Favorites", std::function<void()>(std::bind(&User::favorites, this)));
     add_function(4, "Become an Artist", std::function<void()>(std::bind(&User::become_artist, this)));
     add_function(5, "Log Out", std::function<void()>(std::bind(&User::log_out, this)));
-    add_function(6, "Generate Random Playlist(Input number of Songs and Genre(not required))", std::function<void(int)>(std::bind(&User::generate_random_playlist, this, std::placeholders::_1)));
+    add_function(6, "Generate Random Playlist(Input number of Songs", std::function<void(int)>(std::bind(&User::generate_random_playlist, this, std::placeholders::_1)));
     add_function(7, "Delete Playlist (Input playlist name)", std::function<void(std::string)>(std::bind(&User::delete_playlist, this, std::placeholders::_1)));
     add_function(8, "Add Favorite Song (Input song name)", std::function<void(std::string)>(std::bind(&User::add_favorite_song, this, std::placeholders::_1)));
     add_function(9, "Create Playlist (Input playlist name)", std::function<void(std::string)>(std::bind(&User::create_playlist, this, std::placeholders::_1)));
+    add_function(10, "Add Song to Playlist (Input playlist name and song name)", std::function<void(std::string, std::string)>(std::bind(&User::add_song_to_playlist, this, std::placeholders::_1, std::placeholders::_2)));
+    add_function(11, "Show Songs from Database", std::function<void()>(std::bind(&User::show_songs_from_database, this)));
+    add_function(12, "Help", std::function<void()>(std::bind(&User::help, this)));
 }
 
 void User::initialize_playlist_map() {
     command_map.clear();
     curent_menu = "playlists";
+    output = "Playlists:\n";
     int counter = 0;
-    for (const auto& playlist : playlists) {
+    for (auto& playlist : playlists) {
         ++counter;
         add_function(counter, playlist.getName(),
-                        std::function<std::string()>(std::bind(&Playlist::getPlaylist, &playlist)));
+                        std::function<void()>(std::bind(&User::initialize_playlist_options, this, playlist)));
     }
     add_function(0, "Back to main menu", std::function<void()>(std::bind(&User::initialize_commands, this)));
+}
+
+void User::initialize_playlist_options(Playlist &playlist) {
+    command_map.clear();
+    curent_menu = "playlist_options";
+    output = "Playlist " + playlist.getName() + " options:\n";
+    add_function(1, "Show contents of the playlist", std::function<void()>(std::bind(&User::initialize_songs_map, this, playlist)));
+    add_function(2, "Plays the song", std::function<void()>(std::bind(&Playlist::play, &playlist)));
+    add_function(3, "Skip the song", std::function<void()>(std::bind(&Playlist::skip, &playlist)));
+    add_function(4, "Shuffles playlist", std::function<void()>(std::bind(&Playlist::shuffle, &playlist)));
+    add_function(5, "Unshuffles playlist", std::function<void()>(std::bind(&Playlist::unshuffle, &playlist)));
+    add_function(0, "Back to main menu", std::function<void()>(std::bind(&User::initialize_commands, this)));
+}
+
+void User::initialize_songs_map(Playlist &playlist) {
+    command_map.clear();
+    curent_menu = "songs";
+    output = "Playlist "+ playlist.getName() + "songs:\n";
+    Playlist::PlaylistIterator i = playlist.begin();
+    for(int counter = 1; i != playlist.end(); ++counter, ++i) 
+        add_function(counter,  (*i).getDescription(), std::function<std::string()>(std::bind(&Song::getLyrics, (*i))));
+    add_function(0, "Back to playlist opthions", std::function<void()>(std::bind(&User::initialize_playlist_options, this, playlist)));
 }
 
 
@@ -69,7 +95,8 @@ void User::show_playlists() {
 }
 
 void User::favorites()  {
-    output = favorite_playlist.getPlaylist();
+    initialize_songs_map(favorite_playlist);
+    add_function(0, "Back to main menu", std::function<void()>(std::bind(&User::initialize_commands, this)));
 }
 
 void User::generate_random_playlist(int number_of_songs) {
@@ -148,4 +175,32 @@ void User::become_artist() {
     UserDataInterface users_db;
     users_db.changeAccessLevel(login, 2);
     output = "You are an artist not. For apdate you need to relogin\n";
+}
+
+void User::show_songs_from_database() {
+    SongDataInterface songs_db;
+    std::vector<unsigned int> songs_ids = songs_db.getSongsIds();
+    output = "Songs from database:\n";
+    // load 10 songs from database and change id_index
+    Playlist playlist("Database ");
+    int count = 0;
+    for (;id_index < songs_ids.size() && count < 10; ++id_index, ++count) {
+        playlist.addToPlaylist(songs_db.loadSong(songs_ids[id_index]));
+    }
+    initialize_songs_map(playlist);
+    if(id_index < songs_ids.size())  add_function(11, "Net page", std::function<void()>(std::bind(&User::show_songs_from_database, this)));
+    if(id_index >= 11) add_function(12, "Previous page", std::function<void()>(std::bind(&User::show_songs_from_datbase_privious, this)));
+    add_function(0, "Back to main menu", std::function<void()>(std::bind(&User::initialize_commands, this)));
+
+    id_index += 10 - count;
+
+}
+
+void User::show_songs_from_datbase_privious() {
+    id_index = std::max(0, static_cast<int>(id_index) - 20);
+    show_songs_from_database();
+}
+
+void User::help() {
+    output = "Help: TODO write here text help for user\n";
 }
