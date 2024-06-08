@@ -131,7 +131,7 @@ void TCPServer::handle_logining(TCPConnection::pointer connection, const std::st
     }
     else if (al == 3) {
         it->second = new AdminArtist(users_db.getUserName(args[0]), args[0], args[1]);
-        it->second->load_favorites_playlist(playlists_db.loadPlaylist("My_Songs", args[0])); 
+        it->second->load_my_songs(playlists_db.loadPlaylist("My_Songs", args[0])); 
     }
     it->second->load_playlists(playlists_db.getPlaylists(args[0]));
     it->second->load_favorites_playlist(playlists_db.loadPlaylist("favorites", args[0]));
@@ -242,6 +242,13 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
                 connection->Post("This function requeres input\n");
             else
                 user->execute_command<void(std::string, std::string)>(option, arguments[0], arguments[1]);
+        }
+        else if(option == 13 && artist!=nullptr)
+        {
+            if(arguments.size() < 4)
+                connection->Post("This function requeres input\n");
+            else
+                user->execute_command<void(std::string, std::string, std::string, int)>(option, arguments[0], arguments[1], arguments[2], std::stoi(arguments[3]));
         }
         else
             user->execute_command<void()>(option);

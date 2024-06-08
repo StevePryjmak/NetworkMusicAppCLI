@@ -17,6 +17,7 @@ public:
     std::string get_option() override;
     void load_playlists(std::vector<Playlist> playlists) override;
     void load_favorites_playlist(Playlist favorite_playlist) override;
+    void load_my_songs(Playlist my_songs) override {};
 
     void log_out() override {output = "logged_out";}
     void show_playlists() override;

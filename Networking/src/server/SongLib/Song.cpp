@@ -17,6 +17,25 @@ Song::Song(unsigned int id, std::string name, std::string artist, std::string ge
 	Song::year = year;
 }
 
+Song::Song(unsigned int id, std::string name, std::string artist, std::string genre, std::string lyrics, unsigned int duration, unsigned int year)
+{
+	Song::id = id;
+	if (!name.length()) {
+		throw std::invalid_argument("Name cannot be empty");
+	}
+	Song::name = name;
+	if (!artist.length()) {
+		throw std::invalid_argument("Artist cannot be empty");
+	}
+	Song::artist = artist;
+	Song::genre = genre;
+	Song::lyrics = lyrics;
+	Song::duration = duration;
+	Song::year = year;
+}
+
+
+
 std::string Song::getName() const noexcept
 {
 	return Song::name;

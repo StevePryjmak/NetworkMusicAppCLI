@@ -18,7 +18,7 @@ public:
         : User(name, login, password), Admin(name, login, password), Artist(name, login, password) {
         initialize_commands();
     }
-    
+    void load_my_songs(Playlist my_songs) override;
     void become_artist() override {
         Artist::become_artist();
     }

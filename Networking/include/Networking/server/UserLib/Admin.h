@@ -9,6 +9,7 @@ protected:
 public:
     Admin(const std::string& name, const std::string& login, const std::string& password);
 
+    void load_my_songs(Playlist my_songs) override {};
     void become_artist() { output = "implement this"; } // TODO: Implement this
     void show_all_users() { output = "Implement showing all users"; }
     void show_all_artists() { output = "Implement showing all artists"; }

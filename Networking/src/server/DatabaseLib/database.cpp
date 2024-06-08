@@ -467,6 +467,14 @@ bool SongDataInterface::songExists(std::string name) const noexcept
 	return false;
 }
 
+unsigned int SongDataInterface::getEmptyId() const noexcept
+{
+	unsigned int id = 1;
+	while(existId(id))
+		id++;
+	return id;
+}
+
 void createDirectories() noexcept
 {
 	std::filesystem::create_directories("public/songs");

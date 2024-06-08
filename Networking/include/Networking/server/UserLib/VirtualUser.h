@@ -51,6 +51,7 @@ public:
     virtual void become_artist() = 0;
     virtual void load_playlists(std::vector<Playlist> playlists) = 0;
     virtual void load_favorites_playlist(Playlist favorite_playlist) = 0;
+    virtual void load_my_songs(Playlist my_songs) = 0;
 
     std::string output;
     std::string curent_menu;

@@ -13,6 +13,7 @@ private:
 	unsigned int year;
 public:
 	Song(unsigned int id, std::string name, std::string artist, std::string genre, unsigned int duration, unsigned int year = 2024);
+	Song(unsigned int id, std::string name, std::string artist, std::string genre, std::string lyrics, unsigned int duration, unsigned int year=2024);
 	//Song(unsigned int id, std::string name, Artist* artist, std::string genre, unsigned int duration, unsigned int year); //implement after merging with users classes
 	//void addToPlaylist(Playlist p);
 	std::string getName() const noexcept;

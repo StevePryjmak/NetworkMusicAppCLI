@@ -17,15 +17,16 @@ private:
 public:
 	static unsigned int nextId;
 	SongDataInterface();
-	void saveSong(const Song& song) const;
+	void saveSong(const Song& song) const;                     // TODO save song text also
 	void deleteSong(unsigned int id) const;
-	Song loadSong(unsigned int id) const;
+	Song loadSong(unsigned int id) const;                      // TODO get song text also
 	std::vector<unsigned int> getSongsIds() const noexcept;
 	unsigned int getRandomSongId() const;
 	unsigned int getRandomSongId(std::string genre) const;  // this and priwiouse function should be merged
 	unsigned int getNextIdAndIncrement() noexcept;
 	bool songExists(std::string name) const noexcept;
 	Song loadSong(std::string name) const;
+	unsigned int getEmptyId() const noexcept;
 };
 
 
