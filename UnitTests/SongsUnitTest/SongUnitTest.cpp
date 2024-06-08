@@ -33,3 +33,17 @@ TEST(SongTestDescription, TypicalDescription) {
 	EXPECT_EQ(s.getYear(), 1985);
 	EXPECT_EQ(s.getDescription(), "The Sun Always Shines On T.V. | a-ha | 5:02");
 }
+
+TEST(SongTestLyrics, LyricsGetDefaultLyrics) {
+	Song s(1, "The Sun Always Shines On T.V.", "a-ha", "Synth pop", 302, 1985);
+	EXPECT_EQ(s.getLyrics(), "Sorry, we don't know the lyrics.");
+}
+
+TEST(SongTestLyrics, LyricsAddLyrics) {
+	Song s(1, "The Sun Always Shines On T.V.", "a-ha", "Synth pop", 302, 1985);
+	EXPECT_EQ(s.getLyrics(), "Sorry, we don't know the lyrics.");
+	s.addLyrics("Believe me, the sun always shines on T.V.");
+	EXPECT_EQ(s.getLyrics(), "Believe me, the sun always shines on T.V.");
+	s.addLyrics("Hold me close to your heart.");
+	EXPECT_EQ(s.getLyrics(), "Hold me close to your heart.");
+}
