@@ -42,6 +42,8 @@ public:
     std::function<void(TCPConnection::pointer, const std::string&)> OnClientMessage;
 
     void handle_message(TCPConnection::pointer connection, const std::string& message);
+    void handle_logining(TCPConnection::pointer connection, const std::string& message);
+    //void handle_sign_in(TCPConnection::pointer connection, const std::string& message);
 };
 
 

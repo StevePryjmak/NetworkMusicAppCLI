@@ -3,7 +3,7 @@
 #include "VirtualUser.h"
 
 
-class User : public VirtualUser {
+class User : public virtual VirtualUser {
 protected:
     void initialize_commands() override;
 

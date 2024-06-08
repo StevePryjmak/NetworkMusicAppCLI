@@ -1,7 +1,7 @@
 #pragma once 
 #include "User.h"
 
-class Artist : public User {
+class Artist : public virtual User {
 protected:
     void initialize_commands() override;
     std::vector<Playlist> my_songs; // TODO: Implement this

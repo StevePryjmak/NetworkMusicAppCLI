@@ -51,17 +51,9 @@ void User::initialize_songs_map(Playlist &playlist) {
     command_map.clear();
     curent_menu = "songs";
     output = "Playlist "+ playlist.getName() + "songs:\n";
-
-    std::string description = "";
     Playlist::PlaylistIterator i = playlist.begin();
-    int counter = 0;
-    while (i != playlist.end()) {
-        description = (*i).getDescription();
-        ++i;
-        ++counter;
-        add_function(counter, description, std::function<void()>(std::bind(&Playlist::play, playlist)));
-
-    }
+    for(int counter = 1; i != playlist.end(); ++counter, ++i) 
+        add_function(counter,  (*i).getDescription(), std::function<std::string()>(std::bind(&Song::getLyrics, (*i))));
     add_function(0, "Back to playlist opthions", std::function<void()>(std::bind(&User::initialize_playlist_options, this, playlist)));
 }
 
@@ -103,7 +95,8 @@ void User::show_playlists() {
 }
 
 void User::favorites()  {
-    output = favorite_playlist.getPlaylist();
+    initialize_songs_map(favorite_playlist);
+    add_function(0, "Back to main menu", std::function<void()>(std::bind(&User::initialize_commands, this)));
 }
 
 void User::generate_random_playlist(int number_of_songs) {
@@ -189,7 +182,7 @@ void User::show_songs_from_database() {
     std::vector<unsigned int> songs_ids = songs_db.getSongsIds();
     output = "Songs from database:\n";
     // load 10 songs from database and change id_index
-    Playlist playlist("Temp");
+    Playlist playlist("Database ");
     int count = 0;
     for (;id_index < songs_ids.size() && count < 10; ++id_index, ++count) {
         playlist.addToPlaylist(songs_db.loadSong(songs_ids[id_index]));
