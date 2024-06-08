@@ -96,15 +96,15 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
     std::cout << message<<std::endl;
 
     // implement leter to use something lile map opthin - comand to do something
-    std::string option;
+    std::string option_log;
     std::stringstream ss(message);
     
 
 
-    ss >> option; // Not shure why first is not my opthin comand but invisible sumbol
-    ss >> option;
+    ss >> option_log; // Not shure why first is not my opthin comand but invisible sumbol
+    ss >> option_log;
 
-    if(option == "Log_in") {
+    if(option_log == "Log_in") {
         // initialize user (it must check if user exist from db and if password is correct)
         std::string username, password;
         ss >> username;
@@ -146,7 +146,7 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
         return;
     }
 
-    if(option == "Sign_in") {
+    if(option_log == "Sign_in") {
         std::string name, username, password;
         ss >> name;
         ss >> username;
@@ -167,6 +167,16 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
         return;
     }
 
+    int option;
+    std::stringstream ss_loged(message);
+    
+
+
+    ss_loged >> option_log; 
+    ss_loged >> option;
+
+    std::cout << option << std::endl;
+
     auto user = it->second;
     Admin* admin = dynamic_cast<Admin*>(user);
     Artist* artist = dynamic_cast<Artist*>(user); // maybe it will be neded later
@@ -176,19 +186,19 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
     }
 
     if(user->curent_menu == "main") {
-        if (option == "05") {
+        if (option == 5) {
             user->execute_command<void()>(option);
             connection->Post(user->output + "\n");
             it->second = nullptr;
             return;
         }
-        if (option == "06") {
+        if (option == 6) {
             int argument1;
             ss >> argument1;
             user->execute_command<void(int)>(option, argument1);
         }
-        else if (option == "07" || option == "08" || option == "09" || (option == "14" && admin != nullptr) || 
-                 (option == "12" && artist != nullptr)) {
+        else if (option == 7 || option == 8 || option == 9 || (option == 14 && admin != nullptr) || 
+                 (option == 12 && artist != nullptr)) {
             std::string argument1;
             ss >> argument1;
             if(argument1 == "") {
@@ -197,7 +207,7 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
             }
             user->execute_command<void(std::string)>(option, argument1);
         }
-        else if (option == "10") {
+        else if (option == 10) {
             std::string argument1, argument2;
             ss >> argument1;
             ss >> argument2;
@@ -210,7 +220,7 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
         else
             user->execute_command<void()>(option);
     }
-    else if(user->curent_menu == "playlists" && option != "back") {
+    else if(user->curent_menu == "playlists" && option != 0) {
 
         user->execute_command<std::string()>(option);
     }

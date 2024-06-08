@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <tuple>
 #include <map>
+#include <unordered_map>
 #include <Networking/server/SongLib/Playlist.h>
 #include <Networking/server/DatabaseLib/database.h>
 #include <type_traits>
@@ -27,7 +28,7 @@ protected:
     std::vector<Playlist> playlists;
     Playlist favorite_playlist;
 
-    std::map<std::string, FunctionHolder> command_map;
+    std::map<int, FunctionHolder> command_map;
     void virtual initialize_commands() = 0;
 public:
     virtual ~VirtualUser() = default;
@@ -52,9 +53,9 @@ public:
 
 
     template <typename Func, typename... Args> // It is posible to add return type typename ReturnType but not realy needed
-    std::string execute_command(const std::string& name, Args... args) {
+    std::string execute_command(int key, Args... args) {
         try {
-            auto& holder = command_map.at(name);
+            auto& holder = command_map.at(key);
             auto func = std::any_cast<std::function<Func>>(holder.function);
             if constexpr (std::is_same_v<std::invoke_result_t<std::function<Func>, Args...>, std::string>) {
                 output = func(std::forward<Args>(args)...);
@@ -72,7 +73,7 @@ public:
 
 
     template <typename Func>
-    void add_function(const std::string& name, const std::string& description, Func func) {
-        command_map[name] = FunctionHolder{description, std::function(func)};
+    void add_function(int key, const std::string& description, Func func) {
+        command_map[key] = FunctionHolder{description, std::function(func)};
     }
 };

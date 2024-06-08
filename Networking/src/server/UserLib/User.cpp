@@ -7,16 +7,16 @@ void User::initialize_commands() {
     command_map.clear();
     curent_menu = "main";
     output = "Main menu\n";
-    add_function("01", "My_prifile", std::function<void()>(std::bind(&User::my_profile, this)));
-    add_function("02", "Show Playlists", std::function<void()>(std::bind(&User::show_playlists, this)));
-    add_function("03", "Favorites", std::function<void()>(std::bind(&User::favorites, this)));
-    add_function("04", "Become an Artist", std::function<void()>(std::bind(&User::become_artist, this)));
-    add_function("05", "Log Out", std::function<void()>(std::bind(&User::log_out, this)));
-    add_function("06", "Generate Random Playlist(Input number of Songs and Genre(not required))", std::function<void(int)>(std::bind(&User::generate_random_playlist, this, std::placeholders::_1)));
-    add_function("07", "Delete Playlist (Input playlist name)", std::function<void(std::string)>(std::bind(&User::delete_playlist, this, std::placeholders::_1)));
-    add_function("08", "Add Favorite Song (Input song name)", std::function<void(std::string)>(std::bind(&User::add_favorite_song, this, std::placeholders::_1)));
-    add_function("09", "Create Playlist (Input playlist name)", std::function<void(std::string)>(std::bind(&User::create_playlist, this, std::placeholders::_1)));
-    add_function("10", "Add Song to Playlist (Input playlist name and song name)", std::function<void(std::string, std::string)>(std::bind(&User::add_song_to_playlist, this, std::placeholders::_1, std::placeholders::_2)));
+    add_function(10, "Add Song to Playlist (Input playlist name and song name)", std::function<void(std::string, std::string)>(std::bind(&User::add_song_to_playlist, this, std::placeholders::_1, std::placeholders::_2)));
+    add_function(1, "My_prifile", std::function<void()>(std::bind(&User::my_profile, this)));
+    add_function(2, "Show Playlists", std::function<void()>(std::bind(&User::show_playlists, this)));
+    add_function(3, "Favorites", std::function<void()>(std::bind(&User::favorites, this)));
+    add_function(4, "Become an Artist", std::function<void()>(std::bind(&User::become_artist, this)));
+    add_function(5, "Log Out", std::function<void()>(std::bind(&User::log_out, this)));
+    add_function(6, "Generate Random Playlist(Input number of Songs and Genre(not required))", std::function<void(int)>(std::bind(&User::generate_random_playlist, this, std::placeholders::_1)));
+    add_function(7, "Delete Playlist (Input playlist name)", std::function<void(std::string)>(std::bind(&User::delete_playlist, this, std::placeholders::_1)));
+    add_function(8, "Add Favorite Song (Input song name)", std::function<void(std::string)>(std::bind(&User::add_favorite_song, this, std::placeholders::_1)));
+    add_function(9, "Create Playlist (Input playlist name)", std::function<void(std::string)>(std::bind(&User::create_playlist, this, std::placeholders::_1)));
 }
 
 void User::initialize_playlist_map() {
@@ -25,10 +25,10 @@ void User::initialize_playlist_map() {
     int counter = 0;
     for (const auto& playlist : playlists) {
         ++counter;
-        add_function(std::to_string(counter), playlist.getName(),
+        add_function(counter, playlist.getName(),
                         std::function<std::string()>(std::bind(&Playlist::getPlaylist, &playlist)));
     }
-    add_function("back", "Back to main menu", std::function<void()>(std::bind(&User::initialize_commands, this)));
+    add_function(0, "Back to main menu", std::function<void()>(std::bind(&User::initialize_commands, this)));
 }
 
 
@@ -44,7 +44,7 @@ User::User(const std::string& name, const std::string& login, const std::string&
 std::string User::get_option() {
     std::string option = "";
     for (const auto& pair : command_map) {
-        option += pair.first + ". " + pair.second.description + "\n";
+        option += std::to_string(pair.first) + ". " + pair.second.description + "\n";
     }
     return option;
 }

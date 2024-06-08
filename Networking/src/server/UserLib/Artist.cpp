@@ -2,9 +2,9 @@
 
 void Artist::initialize_commands() {
     User::initialize_commands();
-    add_function("11", "Add Song", std::function<void()>(std::bind(&Artist::add_song, this))); // Change declaratoin later
-    add_function("12", "Delete Song", std::function<void(std::string)>(std::bind(&Artist::delete_song, this, std::placeholders::_1))); // Change declaratoin later
-    add_function("13", "Show My Songs", std::function<void()>(std::bind(&Artist::show_my_songs, this))); // Change declaratoin later
+    add_function(11, "Add Song", std::function<void()>(std::bind(&Artist::add_song, this))); // Change declaratoin later
+    add_function(12, "Delete Song", std::function<void(std::string)>(std::bind(&Artist::delete_song, this, std::placeholders::_1))); // Change declaratoin later
+    add_function(13, "Show My Songs", std::function<void()>(std::bind(&Artist::show_my_songs, this))); // Change declaratoin later
 }
 
 
