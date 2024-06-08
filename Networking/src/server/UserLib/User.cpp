@@ -1,6 +1,7 @@
 #include <Networking/server/UserLib/User.h>
 #include <Networking/server/UserLib/Artist.h>
 #include <iostream>
+#include <algorithm>
 
 
 void User::initialize_commands() {
@@ -184,7 +185,27 @@ void User::become_artist() {
 }
 
 void User::show_songs_from_database() {
-    output = "Songs from database: Not implemented yet\n";
+    SongDataInterface songs_db;
+    std::vector<unsigned int> songs_ids = songs_db.getSongsIds();
+    output = "Songs from database:\n";
+    // load 10 songs from database and change id_index
+    Playlist playlist("Temp");
+    int count = 0;
+    for (;id_index < songs_ids.size() && count < 10; ++id_index, ++count) {
+        playlist.addToPlaylist(songs_db.loadSong(songs_ids[id_index]));
+    }
+    initialize_songs_map(playlist);
+    if(id_index < songs_ids.size())  add_function(11, "Net page", std::function<void()>(std::bind(&User::show_songs_from_database, this)));
+    if(id_index >= 11) add_function(12, "Previous page", std::function<void()>(std::bind(&User::show_songs_from_datbase_privious, this)));
+    add_function(0, "Back to main menu", std::function<void()>(std::bind(&User::initialize_commands, this)));
+
+    id_index += 10 - count;
+
+}
+
+void User::show_songs_from_datbase_privious() {
+    id_index = std::max(0, static_cast<int>(id_index) - 20);
+    show_songs_from_database();
 }
 
 void User::help() {

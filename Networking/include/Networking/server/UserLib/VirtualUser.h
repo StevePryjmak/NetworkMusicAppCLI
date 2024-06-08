@@ -27,6 +27,7 @@ protected:
     std::string password;
     std::vector<Playlist> playlists;
     Playlist favorite_playlist;
+    unsigned int id_index = 0;
 
     std::map<int, FunctionHolder> command_map;
     void virtual initialize_commands() = 0;
@@ -44,6 +45,7 @@ public:
     virtual void create_playlist(std::string playlist_name) = 0;
     virtual void add_song_to_playlist(std::string playlist_name, std::string song_name) = 0;
     virtual void show_songs_from_database() = 0;
+    virtual void show_songs_from_datbase_privious() = 0;
     virtual void help() = 0;
 
     virtual void become_artist() = 0;

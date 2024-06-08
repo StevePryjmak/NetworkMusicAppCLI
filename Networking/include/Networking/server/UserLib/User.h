@@ -31,6 +31,7 @@ public:
 
     void become_artist() override;
     void show_songs_from_database() override;
+    void show_songs_from_datbase_privious() override;
     void help() override;
 };
 
