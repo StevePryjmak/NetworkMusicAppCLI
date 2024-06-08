@@ -123,3 +123,22 @@ TEST(PlaylistTestDeleteSong, DeleteSongCurrentChanges) {
 	p.skip();
 	EXPECT_EQ(p.getCurrent().getDescription(), "The Sun Always Shines On T.V. | a-ha | 5:02");
 }
+
+TEST(PlaylistTestPlaySkip, PlaySkipTypical) {
+	Playlist p("MyPlaylist");
+	Song s(1, "Black Celebration", "Depeche Mode", "Synth pop", 297, 1986);
+	Song s1(2, "The Last Imagination", "Dark Tranquillity", "Death metal", 227);
+	Song s2(3, "The Sun Always Shines On T.V.", "a-ha", "Synth pop", 302, 1985);
+	p.addToPlaylist(s);
+	p.addToPlaylist(s1);
+	p.addToPlaylist(s2);
+	EXPECT_EQ(p.getCurrent().getName(), "Black Celebration");
+	p.skip();
+	EXPECT_EQ(p.getCurrent().getName(), "The Last Imagination");
+	p.play();
+	EXPECT_EQ(p.getCurrent().getName(), "The Last Imagination");
+	p.skip();
+	p.skip();
+	p.play();
+	EXPECT_EQ(p.getCurrent().getName(), "Black Celebration");
+}
