@@ -359,7 +359,7 @@ void SongDataInterface::saveNextId() const
 
 bool SongDataInterface::existId(unsigned int id) const noexcept
 {
-	std::ifstream file("public/song/" + std::to_string(id) + ".txt");
+	std::ifstream file("public/songs/" + std::to_string(id) + ".txt");
 	if (file.is_open())
 	{
 		file.close();

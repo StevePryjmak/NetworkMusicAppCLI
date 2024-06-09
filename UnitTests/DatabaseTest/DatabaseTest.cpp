@@ -54,7 +54,7 @@ TEST(SongTest, getRandom) {
 TEST(SongTest, IdIncrement) {
     clear_directories();
     SongDataInterface sdi;
-    int id = sdi.getNextIdAndIncrement();
+    unsigned int id = sdi.getNextIdAndIncrement();
     EXPECT_EQ(id, 1);
     id = sdi.getNextIdAndIncrement();
     EXPECT_EQ(id, 2);
@@ -63,6 +63,27 @@ TEST(SongTest, IdIncrement) {
     EXPECT_EQ(id, 3);
 }
 
+TEST(SongTest, getEmptyId) {
+    clear_directories();
+    SongDataInterface sdi;
+    unsigned int id = sdi.getNextIdAndIncrement();
+	std::string name = "a a";
+	std::string artist = "b b";
+	std::string genre = "c c";
+	unsigned int duration = 2;
+	unsigned int year = 3;
+    EXPECT_EQ(id, 1);
+    Song s1 = Song(id, name, artist, genre, duration, year);
+    sdi.saveSong(s1);
+    id = sdi.getNextIdAndIncrement();
+    EXPECT_EQ(id, 2);
+    s1 = Song(id, name, artist, genre, duration, year);
+    sdi.saveSong(s1);
+    EXPECT_EQ(sdi.getEmptyId(), 3);
+    EXPECT_NO_THROW(sdi.deleteSong(2));
+    EXPECT_EQ(sdi.getEmptyId(), 2);
+
+}
 
 TEST(UserTest, saveDelete) {
     clear_directories();
