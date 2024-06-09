@@ -36,7 +36,7 @@ Song Playlist::getCurrent()
 	if (current != end())
     	return *current;
 	else
-	return Song(0, "", "", "", 0, 0);
+	return Song(0, "unknown", "unknown", "", 0, 0);
 }
 Playlist::Playlist(std::string name)
 {
@@ -109,15 +109,16 @@ void Playlist::unshuffle() noexcept
 
 void Playlist::skip() noexcept
 {
-	++current;
-	if (current == end()){
-		current = begin();
+	if (end()!=begin()){
+		++current;
+		if (current == end()){
+				current = begin();
 		std::cout << "Playlist ended, Starting form beginig\n";
+		}
+		else
+			std::cout << (*current).getDescription() << "\n";
 	}
-	else
-		std::cout << (*current).getDescription() << "\n";
 }
-
 void Playlist::show() const noexcept
 {
 	std::cout << getPlaylist();

@@ -52,7 +52,7 @@ void User::initialize_songs_map(Playlist &playlist) {
     curent_menu = "songs";
     output = "Playlist "+ playlist.getName() + "songs:\n";
     Playlist::PlaylistIterator i = playlist.begin();
-    for(int counter = 1; i != playlist.end(); ++counter, ++i) 
+    for(int counter = 1; i != playlist.end(); ++counter, ++i)
         add_function(counter,  (*i).getDescription(), std::function<std::string()>(std::bind(&Song::getLyrics, (*i))));
     add_function(0, "Back to playlist opthions", std::function<void()>(std::bind(&User::initialize_playlist_options, this, playlist)));
 }
@@ -204,7 +204,7 @@ void User::show_songs_from_datbase_privious() {
 
 void User::help() {
     output = "Help:\n";
-    output = "To use a command enter number of the command and an argument if needed\n";
+    output += "To use a command enter number of the command and an argument if needed\nIf the argument has more than one word put it in \"\"\n";
     output += "1. Shows your profile info\n2. Shows your playlist and allows further actions on playlist\n";
     output += "3. Shows your favorite songs\n4. Allows you to become an artist. Changes will be applied after logging out.\n";
     output += "5. Logs you out and saves changes\n6. Generates random playlist. Requires number of songs\n";
