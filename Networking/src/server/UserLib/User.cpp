@@ -8,7 +8,7 @@ void User::initialize_commands() {
     command_map.clear();
     curent_menu = "main";
     output = "Main menu\n";
-    add_function(1, "My_prifile", std::function<void()>(std::bind(&User::my_profile, this)));
+    add_function(1, "My profile", std::function<void()>(std::bind(&User::my_profile, this)));
     add_function(2, "Show Playlists", std::function<void()>(std::bind(&User::show_playlists, this)));
     add_function(3, "Favorites", std::function<void()>(std::bind(&User::favorites, this)));
     add_function(4, "Become an Artist", std::function<void()>(std::bind(&User::become_artist, this)));
@@ -203,6 +203,12 @@ void User::show_songs_from_datbase_privious() {
 }
 
 void User::help() {
-    output = "Help: You chose option then if funciton takest arguments write them, separeted by spaces\n";
-    output += "If argument have more then one word write in auotes\n";
+    output = "Help:\n";
+    output = "To use a command enter number of the command and an argument if needed\n";
+    output += "1. Shows your profile info\n2. Shows your playlist and allows further actions on playlist\n";
+    output += "3. Shows your favorite songs\n4. Allows you to become an artist. Changes will be applied after logging out.\n";
+    output += "5. Logs you out and saves changes\n6. Generates random playlist. Requires number of songs\n";
+    output += "7. Deletes Playlist. Requires name of the playlist\n8. Adds song to favorites. Requires song name\n";
+    output += "9. Creates empty playlist. Requires playlist name\n10. Adds song to playlist. Requires playlist name and then song\n";
+    output += "11. Shows list of songs in the database\n";
 }

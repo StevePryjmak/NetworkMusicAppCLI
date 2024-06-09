@@ -84,9 +84,9 @@ public:
 	};
 private:
 	unsigned int duration = 0;
-	PlaylistIterator current = PlaylistIterator(playlist.end(), this);
+	PlaylistIterator current = PlaylistIterator(playlist.begin(), this);
 public:
-	Playlist() = default;
+	Playlist() {current = begin();};
 	Playlist(std::string name);
 	std::string getPlaylist() const noexcept;
 	std::string getName() const noexcept;

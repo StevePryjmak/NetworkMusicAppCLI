@@ -274,7 +274,7 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
 
     std::string response =  user->output;
     connection->Post(response + "\n\n");
-    connection->Post("Chose opthin: \n" + it->second->get_option()); 
+    connection->Post("Choose opthion: \n" + it->second->get_option()); 
 
 }
 

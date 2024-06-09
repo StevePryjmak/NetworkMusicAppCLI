@@ -244,7 +244,7 @@ void UserDataInterface::addUser(const std::string& name, const std::string& logi
 	{
 		throw std::runtime_error("Unable to open file");
 	}
-	file<<password<<" "<<replaceSpaces(name)<<" "<<privilageLevele<<std::endl;
+	file<<generateHash(password)<<" "<<replaceSpaces(name)<<" "<<privilageLevele<<std::endl;
 	file.close();
 }
 
@@ -429,6 +429,7 @@ Song SongDataInterface::loadSong(unsigned int id) const
 	if (lyrics.is_open())
 	{
 		text << lyrics.rdbuf();
+		lyrics.close();
 	}
 	Song s = Song(id, restoreSpaces(name), restoreSpaces(artist),
 	restoreSpaces(genre), text.str(), duration, year);
