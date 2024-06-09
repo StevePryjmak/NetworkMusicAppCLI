@@ -20,13 +20,13 @@ public:
 	void saveSong(const Song& song) const;                     // TODO save song text also
 	void deleteSong(unsigned int id) const;
 	Song loadSong(unsigned int id) const;                      // TODO get song text also
+	Song loadSong(std::string name) const;
 	std::vector<unsigned int> getSongsIds() const noexcept;
 	unsigned int getRandomSongId() const;
 	unsigned int getRandomSongId(std::string genre) const;  // this and priwiouse function should be merged
 	unsigned int getNextIdAndIncrement() noexcept;
 	bool songExists(std::string name) const noexcept;
-	Song loadSong(std::string name) const;
-	unsigned int getEmptyId() const noexcept;
+	unsigned int getEmptyId() noexcept;
 };
 
 
@@ -59,6 +59,7 @@ public:
 	bool validUserData(const std::string& login, const std::string& password) const noexcept;
 	bool existLogin(const std::string& login) const noexcept;
 	std::string getUserName(const std::string& login) const;
+	std::vector<std::string> getLogins() const noexcept;
 };
 
 void createDirectories() noexcept;
