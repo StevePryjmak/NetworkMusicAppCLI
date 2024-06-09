@@ -475,6 +475,29 @@ unsigned int SongDataInterface::getEmptyId() const noexcept
 	return id;
 }
 
+unsigned int SongDataInterface::getSongId(std::string name) const {
+	for (unsigned int id : getSongsIds())
+	{
+		Song s = loadSong(id);
+		if (s.getName() == name)
+			return id;
+	}
+	throw std::runtime_error("Song not found");
+}
+bool SongDataInterface::checkIfAutorOfSong(std::string artist_name, unsigned int song_id) const {
+	std::ifstream file("public/songs/" + std::to_string(song_id) + ".txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	std::string name;
+	file>>name;
+	file>>name;
+	file.close();
+	return name == artist_name;
+
+}
+
 void createDirectories() noexcept
 {
 	std::filesystem::create_directories("public/songs");

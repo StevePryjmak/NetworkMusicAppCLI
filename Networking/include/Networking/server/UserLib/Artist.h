@@ -11,7 +11,7 @@ public:
 
     void add_song(std::string name, std::string genre, std::string lyrics, int duratoin);
     void load_my_songs(Playlist my_songs) override;
-    void delete_song(std::string song_name) {output = "sonng " + song_name + "Deletion not implemented";}; // delete song from my_songs
+    void delete_song(std::string song_name);
     void show_my_songs();
 };
 
