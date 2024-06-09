@@ -135,6 +135,10 @@ void TCPServer::handle_logining(TCPConnection::pointer connection, const std::st
     }
     it->second->load_playlists(playlists_db.getPlaylists(args[0]));
     it->second->load_favorites_playlist(playlists_db.loadPlaylist("favorites", args[0]));
+
+    const std::string& message1 = "logined\n";
+    connection->Post(message1);
+    connection->Post("Chose opthin: \n" + it->second->get_option());
 }
 
 // void TCPServer::handle_sign_in(TCPConnection::pointer connection, const std::string& message) {
@@ -167,14 +171,8 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
     ss >> option_log;
     ss >> option_log;
 
-    if(option_log == "Log_in") {
-        handle_logining(connection, message);
-
-        const std::string& message1 = "logined\n";
-        connection->Post(message1);
-        connection->Post("Chose opthin: \n" + it->second->get_option());
-        return;
-    }
+    if(option_log == "Log_in") 
+        return handle_logining(connection, message);
 
     if(option_log == "Sign_in") {
         std::string name, username, password;
