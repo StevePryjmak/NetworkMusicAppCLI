@@ -23,6 +23,14 @@ TEST(SongTestConstructor, ConstructorWOYear) {
 	EXPECT_EQ(s.getYear(), 2024);
 }
 
+TEST(SongTestConstructor, ConstructorNameNotGiven) {
+	EXPECT_THROW(Song(0, "", "a", "a", 222, 222), std::invalid_argument);
+}
+
+TEST(SongTestConstructor, ConstructorArtistNotGiven) {
+	EXPECT_THROW(Song(0, "a", "", "a", 222, 222), std::invalid_argument);
+}
+
 TEST(SongTestDescription, TypicalDescription) {
 	Song s(1, "The Sun Always Shines On T.V.", "a-ha", "Synth pop", 302, 1985);
 	EXPECT_EQ(s.getName(), "The Sun Always Shines On T.V.");
