@@ -181,6 +181,7 @@ void User::show_songs_from_database() {
     SongDataInterface songs_db;
     std::vector<unsigned int> songs_ids = songs_db.getSongsIds();
     output = "Songs from database:\n";
+    if (id_index >= songs_ids.size()) id_index = 0;
     // load 10 songs from database and change id_index
     Playlist playlist("Database ");
     int count = 0;

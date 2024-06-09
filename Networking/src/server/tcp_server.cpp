@@ -210,61 +210,64 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
     Artist* artist = dynamic_cast<Artist*>(user);
     AdminArtist* admin_artist = dynamic_cast<AdminArtist*>(user);
     try {
-    if (user == nullptr) {
-        connection->Post("You must log in first\n");
-        return;
-    }
-
-    if(user->curent_menu == "main") {
-        if (option == 5) {
-            user->execute_command<void()>(option);
-            connection->Post(user->output + "\n");
-            connection->Post("Press random key to continue\n");
-            it->second = nullptr;
+        if (user == nullptr) {
+            connection->Post("You must log in first\n");
             return;
         }
-        if (option == 6) {
-            int argument1;
-            ss >> argument1;
-            user->execute_command<void(int)>(option, argument1);
-        }
-        else if (option == 7 || option == 8 || option == 9 || (option == 16 && admin != nullptr) || 
-                 (option == 14 && artist != nullptr)) 
-        {
 
-            if(arguments.size() == 0) 
-                connection->Post("This function requeres input\n");
-            else
-                user->execute_command<void(std::string)>(option, arguments[0]);
-        }
-        else if (option == 10) {
+        if(user->curent_menu == "main") {
+            if (option == 5) {
+                user->execute_command<void()>(option);
+                connection->Post(user->output + "\n");
+                connection->Post("Press random key to continue\n");
+                it->second = nullptr;
+                return;
+            }
+            if (option == 6) {
+                int argument1;
+                ss >> argument1;
+                user->execute_command<void(int)>(option, argument1);
+            }
+            else if (option == 7 || option == 8 || option == 9 || (option == 14 && (admin != nullptr || artist != nullptr)) ||  
+                    (option == 17 && admin_artist != nullptr)) 
+            {
 
-            if(arguments.size() < 2)
-                connection->Post("This function requeres input\n");
+                if(arguments.size() == 0) 
+                    connection->Post("This function requeres input\n");
+                else
+                    user->execute_command<void(std::string)>(option, arguments[0]);
+            }
+            else if (option == 10) {
+
+                if(arguments.size() < 2)
+                    connection->Post("This function requeres input\n");
+                else
+                    user->execute_command<void(std::string, std::string)>(option, arguments[0], arguments[1]);
+            }
+            else if(option == 13 && artist!=nullptr)
+            {
+                if(arguments.size() < 4)
+                    connection->Post("This function requeres input\n");
+                else
+                    user->execute_command<void(std::string, std::string, std::string, int)>(option, arguments[0], arguments[1], arguments[2], std::stoi(arguments[3]));
+            }
             else
-                user->execute_command<void(std::string, std::string)>(option, arguments[0], arguments[1]);
+                user->execute_command<void()>(option);
         }
-        else if(option == 13 && artist!=nullptr)
-        {
-            if(arguments.size() < 4)
-                connection->Post("This function requeres input\n");
-            else
-                user->execute_command<void(std::string, std::string, std::string, int)>(option, arguments[0], arguments[1], arguments[2], std::stoi(arguments[3]));
-        }
-        else
+        else if(user->curent_menu == "playlists" && option != 0) {
+
+            //user->execute_command<std::string()>(option);
             user->execute_command<void()>(option);
-    }
-    else if(user->curent_menu == "playlists" && option != 0) {
-
-        //user->execute_command<std::string()>(option);
-        user->execute_command<void()>(option);
-    }
-    else if(user->curent_menu == "songs" && option != 11 && option != 0 && option != 12) 
-    user->execute_command<std::string()>(option);
-    else if(user->curent_menu == "playlist_options") {
-        user->execute_command<void()>(option);
-    }
-    else user->execute_command<void()>(option);
+        }
+        else if(user->curent_menu == "songs" && option != 11 && option != 0 && option != 12) 
+        user->execute_command<std::string()>(option);
+        else if(user->curent_menu == "playlist_options") {
+            user->execute_command<std::string()>(option);
+        }
+        else if(user->curent_menu == "Users") {
+            user->execute_command<void()>(option);
+        }
+        else user->execute_command<void()>(option);
 
     } catch (std::exception& e) {
         std::cout << e.what() << std::endl;

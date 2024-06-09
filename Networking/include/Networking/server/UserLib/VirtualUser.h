@@ -28,6 +28,7 @@ protected:
     std::vector<Playlist> playlists;
     Playlist favorite_playlist;
     unsigned int id_index = 0;
+    unsigned int login_index = 0;
 
     std::map<int, FunctionHolder> command_map;
     void virtual initialize_commands() = 0;

@@ -11,6 +11,7 @@ public:
 
     void load_my_songs(Playlist my_songs) override {};
     void become_artist() override;
-    void show_all_users() {}
+    void show_all_users();
+    void show_all_user_privious();
     void add_admin(std::string username);
 };
