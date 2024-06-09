@@ -10,6 +10,13 @@ TEST(PlaylistTestConstructor, EmptyPlaylist) {
 	EXPECT_EQ(p.formatDuration(), "0:00");
 }
 
+TEST(PlaylistTestConstructor, CurrentAssignment) {
+	Playlist p("MyPlaylist");
+	p.play();
+	p.skip();
+	EXPECT_EQ(p.getCurrent().getName(), "unknown");
+}
+
 TEST(PlaylistTestAddToPlaylist, AddToPlaylistOneSong) {
 	Playlist p("MyPlaylist");
 	EXPECT_EQ(p.getName(), "MyPlaylist");
@@ -47,6 +54,24 @@ TEST(PlaylistTestAddToPlaylist, AddToPlaylistMoreSongs) {
 	EXPECT_EQ((*(++i)).getDescription(), "The Sun Always Shines On T.V. | a-ha | 5:02");
 }
 
+TEST(PlaylistTestAddToPlaylist, OneSongCurrentAssignment) {
+	Playlist p("MyPlaylist");
+	EXPECT_EQ(p.getName(), "MyPlaylist");
+	EXPECT_EQ(p.getDuration(), 0);
+	EXPECT_EQ(p.formatDuration(), "0:00");
+	Song s(1, "Black Celebration", "Depeche Mode", "Synth pop", 297, 1986);
+	p.addToPlaylist(s);
+	EXPECT_EQ(p.getCurrent().getName(), "Black Celebration");
+	p.play();
+	p.skip();
+	EXPECT_EQ(p.getCurrent().getName(), "Black Celebration");
+}
+
+TEST(PlaylistGetPlaylist, PlaylistEmpty) {
+	Playlist p("MyPlaylist");
+	EXPECT_EQ(p.getPlaylist(), "");
+}
+
 TEST(PlaylistGetPlaylist, PlaylistNotEmpty) {
 	Playlist p("MyPlaylist");
 	EXPECT_EQ(p.getName(), "MyPlaylist");
@@ -75,7 +100,7 @@ TEST(PlaylistTestAddToPlaylist, AddSongCurrentTest) {
 	EXPECT_EQ(p.getCurrent().getDescription(), "The Last Imagination | Dark Tranquillity | 3:47");
 }
 
-TEST(PlaylistTestDeleteFromPlaylist, DeleteFromBegginingOfPlaylistByIteartor) {
+TEST(PlaylistTestDeleteFromPlaylist, DeleteFromBegginingOfPlaylistByIterator) {
 	Playlist p("MyPlaylist");
 	Song s(1, "Black Celebration", "Depeche Mode", "Synth pop", 297, 1986);
 	Song s1(2, "The Last Imagination", "Dark Tranquillity", "Death metal", 227);
