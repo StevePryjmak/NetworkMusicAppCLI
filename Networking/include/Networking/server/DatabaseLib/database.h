@@ -28,8 +28,7 @@ public:
 	bool songExists(std::string name) const noexcept;
 	unsigned int getSongId(std::string name) const;
 	bool checkIfAutorOfSong(std::string artist_name, unsigned int song_id) const;
-	Song loadSong(std::string name) const;
-	unsigned int getEmptyId() const noexcept;
+	unsigned int getEmptyId() noexcept;
 };
 
 
