@@ -202,5 +202,6 @@ void User::show_songs_from_datbase_privious() {
 }
 
 void User::help() {
-    output = "Help: TODO write here text help for user\n";
+    output = "Help: You chose option then if funciton takest arguments write them, separeted by spaces\n";
+    output += "If argument have more then one word write in auotes\n";
 }

@@ -26,7 +26,10 @@ public:
 	unsigned int getRandomSongId(std::string genre) const;  // this and priwiouse function should be merged
 	unsigned int getNextIdAndIncrement() noexcept;
 	bool songExists(std::string name) const noexcept;
-	unsigned int getEmptyId() noexcept;
+	unsigned int getSongId(std::string name) const;
+	bool checkIfAutorOfSong(std::string artist_name, unsigned int song_id) const;
+	Song loadSong(std::string name) const;
+	unsigned int getEmptyId() const noexcept;
 };
 
 

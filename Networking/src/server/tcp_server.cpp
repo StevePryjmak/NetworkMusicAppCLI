@@ -127,7 +127,7 @@ void TCPServer::handle_logining(TCPConnection::pointer connection, const std::st
     else if (al == 1)  it->second = new User(users_db.getUserName(args[0]), args[0], args[1]);
     else if (al == 2) {
         it->second = new Artist(users_db.getUserName(args[0]), args[0], args[1]);
-        it->second->load_favorites_playlist(playlists_db.loadPlaylist("My_Songs", args[0])); 
+        it->second->load_my_songs(playlists_db.loadPlaylist("My_Songs", args[0])); 
     }
     else if (al == 3) {
         it->second = new AdminArtist(users_db.getUserName(args[0]), args[0], args[1]);
@@ -209,6 +209,7 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
     Admin* admin = dynamic_cast<Admin*>(user);
     Artist* artist = dynamic_cast<Artist*>(user);
     AdminArtist* admin_artist = dynamic_cast<AdminArtist*>(user);
+    try {
     if (user == nullptr) {
         connection->Post("You must log in first\n");
         return;
@@ -265,7 +266,10 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
     }
     else user->execute_command<void()>(option);
 
-
+    } catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
+        user->output = "Something weent wrong. Try again\n";
+    }
 
     std::string response =  user->output;
     connection->Post(response + "\n\n");
