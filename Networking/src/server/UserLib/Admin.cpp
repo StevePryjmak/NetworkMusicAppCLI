@@ -53,7 +53,7 @@ void Admin::show_all_users() {
         else if (al == 2)  user = new  Artist(user_db.getUserName(users[login_index]),users[login_index], "pass" );
         else if (al == 3)  user = new  AdminArtist(user_db.getUserName(users[login_index]),users[login_index], "pass" );
         else  user = new User(user_db.getUserName(users[login_index]),users[login_index], "pass" );
-        add_function(count, al_string, std::function<void()>(std::bind(&User::my_profile,  user)));
+        add_function(count, al_string, std::function<void()>(std::bind(&Admin::show_user_profile,  this, users[login_index])));
 
     }
     if(login_index < users.size())  add_function(11, "Net page", std::function<void()>(std::bind(&Admin::show_all_users, this)));
@@ -69,6 +69,27 @@ void Admin::show_all_user_privious() {
     show_all_users();
 }
 
+void Admin::show_user_profile(std::string username) {
+    UserDataInterface user_db;
+    unsigned int al = user_db.getAccessLevel(username);
+    std::string al_string;
+    if (al == 0) al_string +=  "Admin";
+    else if (al == 1) al_string += "User";
+    else if (al == 2) al_string += "Artist";
+    else if (al == 3) al_string += "AdminArtist";
+    else al_string += "Unknown";
+    output = "User profile:\n";
+    output += "Name: " + user_db.getUserName(username) + "\n";
+    output += "Login: " + username + "\n";
+    output += "Playlists:\n";
+    PlaylistDataInterface playlists_db;
+    std::vector<Playlist> playlists = playlists_db.getPlaylists(username);
+    for (auto& playlist : playlists) {
+        output += playlist.getName() + "\n";
+    }
+    output += "Access level: " + al_string + "\n";
+    // add_function(0, "Back to users", std::function<void()>(std::bind(&Admin::show_all_users, this)));
+}
 
 
 void Admin::become_artist() {

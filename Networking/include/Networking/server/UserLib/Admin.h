@@ -10,6 +10,7 @@ public:
     Admin(const std::string& name, const std::string& login, const std::string& password);
 
     void load_my_songs(Playlist my_songs) override {};
+    void show_user_profile(std::string username);
     void become_artist() override;
     void show_all_users();
     void show_all_user_privious();

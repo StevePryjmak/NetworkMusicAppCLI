@@ -262,7 +262,7 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
         else if(user->curent_menu == "playlist_options") {
             user->execute_command<std::string()>(option);
         }
-        else if(user->curent_menu == "Users") {
+        else if(user->curent_menu == "Users" && option != 0 && option != 11 && option != 12) {
             user->execute_command<void()>(option);
         }
         else user->execute_command<void()>(option);
