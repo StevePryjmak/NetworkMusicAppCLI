@@ -1,7 +1,7 @@
 
 #include <Networking/server/tcp_server.h>
-
 #include <iostream>
+#include <vector>
 
 
 using boost::asio::ip::tcp;
@@ -71,80 +71,108 @@ void TCPServer::start_accept() {
 
 
 
-std::string get_first_word(const std::string& message) {
+std::vector<std::string> get_arguments(const std::string& message) {
+    std::vector<std::string> arguments;
     std::istringstream stream(message);
-    std::string first_word;
-    stream >> first_word;// first_word is invisible sumbol
-    stream >> first_word;
+    std::string argument;
+    stream >> argument;// first_word is invisible sumbol
+    stream >> argument;
 
-    // Check if the last character is a newline and remove it
-    if (!first_word.empty() && first_word.back() == '\n') {
-        first_word.pop_back();
+    while (stream >> argument) {
+        if (argument[0] == '"' && argument.back() == '"') {
+            if (argument.size() == 2) continue;
+            argument = argument.substr(1, argument.size() - 2);
+        } else if (argument[0] == '"') {
+            std::string temp;
+            std::string quoted_argument = argument.substr(1);
+            while (stream >> temp) {
+                if (temp.back() == '"') {
+                    quoted_argument += " " + temp.substr(0, temp.size() - 1);
+                    break;
+                } else {
+                    quoted_argument += " " + temp;
+                }
+            }
+            argument = quoted_argument;
+        }
+
+        arguments.push_back(argument);
     }
 
-    return first_word;
+    for(auto arg : arguments) {
+        std::cout << arg << std::endl;
+    }
+
+    return arguments;
 }
 
+void TCPServer::handle_logining(TCPConnection::pointer connection, const std::string& message) {
 
-void TCPServer::handle_message(TCPConnection::pointer connection, const std::string& message) {
-    //Broadcast(message);
+    std::vector<std::string> args = get_arguments(message);
+    if(!users_db.validUserData(args[0], args[1])) {
+        connection->Post("Invalid username or password\n");
+        return;
+    }
+    if(args.size() < 2) {
+        connection->Post("Login or pasword cant be emty\n");
+        return;
+    }
+
     auto it = std::find_if(connections.begin(), connections.end(), 
         [connection](const auto& pair) { return pair.first == connection; });
 
-    if (it == connections.end()) return;
+    int al = users_db.getAccessLevel(args[0]);
 
+    if (al == 0)       it->second = new Admin(users_db.getUserName(args[0]), args[0], args[1]);
+    else if (al == 1)  it->second = new User(users_db.getUserName(args[0]), args[0], args[1]);
+    else if (al == 2) {
+        it->second = new Artist(users_db.getUserName(args[0]), args[0], args[1]);
+        it->second->load_my_songs(playlists_db.loadPlaylist("My_Songs", args[0])); 
+    }
+    else if (al == 3) {
+        it->second = new AdminArtist(users_db.getUserName(args[0]), args[0], args[1]);
+        it->second->load_my_songs(playlists_db.loadPlaylist("My_Songs", args[0])); 
+    }
+    it->second->load_playlists(playlists_db.getPlaylists(args[0]));
+    it->second->load_favorites_playlist(playlists_db.loadPlaylist("favorites", args[0]));
+
+    const std::string& message1 = "logined\n";
+    connection->Post(message1);
+    connection->Post("Chose opthin: \n" + it->second->get_option());
+}
+
+// void TCPServer::handle_sign_in(TCPConnection::pointer connection, const std::string& message) {
+//         std::vector<std::string> args = get_arguments(message);
+
+//         if (users_db.existLogin(args[1])) {
+//             connection->Post("Username already exist\n");
+//             return;
+//         }
+//         if(args.size() < 3) {
+//             connection->Post("Login or pasword cant be emty\n");
+//             return;
+//         }
+//         auto it = std::find_if(connections.begin(), connections.end(), [connection](const auto& pair) { return pair.first == connection; });
+//         it->second = new User(args[0], args[1], args[2]);
+//         users_db.addUser(args[0], args[1], args[2], 1);
+// }
+
+
+void TCPServer::handle_message(TCPConnection::pointer connection, const std::string& message) {
+
+
+    auto it = std::find_if(connections.begin(), connections.end(), [connection](const auto& pair) { return pair.first == connection; });
+    if (it == connections.end()) return;
     std::cout << message<<std::endl;
 
-    // implement leter to use something lile map opthin - comand to do something
     std::string option_log;
     std::stringstream ss(message);
-    
 
-
-    ss >> option_log; // Not shure why first is not my opthin comand but invisible sumbol
+    ss >> option_log;
     ss >> option_log;
 
-    if(option_log == "Log_in") {
-        // initialize user (it must check if user exist from db and if password is correct)
-        std::string username, password;
-        ss >> username;
-        ss >> password;
-        if(!users_db.validUserData(username, password)) {
-            connection->Post("Invalid username or password\n");
-            return;
-        }
-        std::cout << username << " " << password << std::endl;
-
-
-        
-        switch (users_db.getAccessLevel(username)) {
-            case 3:
-                //it->second = new AdminArtist(users_db.getUserName(username), username, password);// TODO: implement constructor
-                break;
-            case 2:
-                it->second = new Artist(users_db.getUserName(username), username, password);
-                //it->second-> // TODO: load artist songs playlist
-                break;
-            case 1:
-                it->second = new User(users_db.getUserName(username), username, password);
-                break;
-            case 0:
-                it->second = new Admin(users_db.getUserName(username), username, password);
-                break;
-            default:
-
-                break;
-        }
-        it->second->load_playlists(playlists_db.getPlaylists(username));
-        it->second->load_favorites_playlist(playlists_db.loadPlaylist("favorites", username));
-
-
-        const std::string& message1 = "logined\n";
-        std::cout<< message1 <<std::endl;
-        connection->Post(message1);
-        connection->Post("Chose opthin: \n" + it->second->get_option()); // + "\n"
-        return;
-    }
+    if(option_log == "Log_in") 
+        return handle_logining(connection, message);
 
     if(option_log == "Sign_in") {
         std::string name, username, password;
@@ -155,78 +183,94 @@ void TCPServer::handle_message(TCPConnection::pointer connection, const std::str
             connection->Post("Username already exist\n");
             return;
         }
-        std::cout << name << " " << username << " " << password << std::endl;
         it->second = new User(name, username, password);
         users_db.addUser(name, username, password, 1);
+        //handle_sign_in(connection, message); // maybe it will be debuged later
         
 
         const std::string& message1 = "logined\n";
         std::cout<< message1 <<std::endl;
         connection->Post(message1);
-        connection->Post("Chose opthin: \n" + it->second->get_option()); // + "\n"
+        connection->Post("Chose opthin: \n" + it->second->get_option());
         return;
     }
 
     int option;
     std::stringstream ss_loged(message);
-    
+    std::vector<std::string> arguments = get_arguments(message);
 
 
     ss_loged >> option_log; 
     ss_loged >> option;
 
-    std::cout << option << std::endl;
-
     auto user = it->second;
     Admin* admin = dynamic_cast<Admin*>(user);
-    Artist* artist = dynamic_cast<Artist*>(user); // maybe it will be neded later
-    if (user == nullptr) {
-        connection->Post("You must log in first\n");
-        return;
-    }
-
-    if(user->curent_menu == "main") {
-        if (option == 5) {
-            user->execute_command<void()>(option);
-            connection->Post(user->output + "\n");
-            it->second = nullptr;
+    Artist* artist = dynamic_cast<Artist*>(user);
+    AdminArtist* admin_artist = dynamic_cast<AdminArtist*>(user);
+    try {
+        if (user == nullptr) {
+            connection->Post("You must log in first\n");
             return;
         }
-        if (option == 6) {
-            int argument1;
-            ss >> argument1;
-            user->execute_command<void(int)>(option, argument1);
-        }
-        else if (option == 7 || option == 8 || option == 9 || (option == 14 && admin != nullptr) || 
-                 (option == 12 && artist != nullptr)) {
-            std::string argument1;
-            ss >> argument1;
-            if(argument1 == "") {
-                connection->Post("This function requeres input\n");
+
+        if(user->curent_menu == "main") {
+            if (option == 5) {
+                user->execute_command<void()>(option);
+                connection->Post(user->output + "\n");
+                connection->Post("Press random key to continue\n");
+                it->second = nullptr;
                 return;
             }
-            user->execute_command<void(std::string)>(option, argument1);
-        }
-        else if (option == 10) {
-            std::string argument1, argument2;
-            ss >> argument1;
-            ss >> argument2;
-            if(argument1 == "" || argument2 == "") {
-                connection->Post("This function requeres input\n");
-                return;
+            if (option == 6) {
+                int argument1;
+                ss >> argument1;
+                user->execute_command<void(int)>(option, argument1);
             }
-            user->execute_command<void(std::string, std::string)>(option, argument1, argument2);
+            else if (option == 7 || option == 8 || option == 9 || (option == 14 && (admin != nullptr || artist != nullptr)) ||  
+                    (option == 17 && admin_artist != nullptr)) 
+            {
+
+                if(arguments.size() == 0) 
+                    connection->Post("This function requeres input\n");
+                else
+                    user->execute_command<void(std::string)>(option, arguments[0]);
+            }
+            else if (option == 10) {
+
+                if(arguments.size() < 2)
+                    connection->Post("This function requeres input\n");
+                else
+                    user->execute_command<void(std::string, std::string)>(option, arguments[0], arguments[1]);
+            }
+            else if(option == 13 && artist!=nullptr)
+            {
+                if(arguments.size() < 4)
+                    connection->Post("This function requeres input\n");
+                else
+                    user->execute_command<void(std::string, std::string, std::string, int)>(option, arguments[0], arguments[1], arguments[2], std::stoi(arguments[3]));
+            }
+            else
+                user->execute_command<void()>(option);
         }
-        else
+        else if(user->curent_menu == "playlists" && option != 0) {
+
+            //user->execute_command<std::string()>(option);
             user->execute_command<void()>(option);
-    }
-    else if(user->curent_menu == "playlists" && option != 0) {
-
+        }
+        else if(user->curent_menu == "songs" && option != 11 && option != 0 && option != 12) 
         user->execute_command<std::string()>(option);
+        else if(user->curent_menu == "playlist_options") {
+            user->execute_command<std::string()>(option);
+        }
+        else if(user->curent_menu == "Users") {
+            user->execute_command<void()>(option);
+        }
+        else user->execute_command<void()>(option);
+
+    } catch (std::exception& e) {
+        std::cout << e.what() << std::endl;
+        user->output = "Something weent wrong. Try again\n";
     }
-    else user->execute_command<void()>(option);
-
-
 
     std::string response =  user->output;
     connection->Post(response + "\n\n");

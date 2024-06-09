@@ -12,3 +12,8 @@
 //     add_function("16", "Delete Song", std::function<void(std::string)>(std::bind(&AdminArtist::delete_song, this, std::placeholders::_1)));
 //     add_function("17", "Show My Songs", std::function<void()>(std::bind(&AdminArtist::show_my_songs, this)));
 // } // TODO Neet to be changed later(check if it check for admin or for artist) fiirst because it have 2 base pointers)
+
+
+void AdminArtist::load_my_songs(Playlist my_songs) {
+    Artist::load_my_songs(my_songs);
+}

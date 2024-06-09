@@ -33,10 +33,14 @@ Playlist::PlaylistIterator Playlist::end() const
 
 Song Playlist::getCurrent()
 {
-    return *current;
+	if (current != end())
+    	return *current;
+	else
+	return Song(0, "", "", "", 0, 0);
 }
 Playlist::Playlist(std::string name)
 {
+	current = begin();
 	Playlist::name = name;
 }
 
@@ -86,8 +90,11 @@ std::string Playlist::getDescription() const noexcept
 
 void Playlist::play() noexcept
 {
-	current = begin();
-	std::cout << (*current).getDescription() << "\n";
+	if (current == end()){
+		std::cout << "Playlist ended\n";
+	}
+	else
+		std::cout << (*current).getDescription() << "\n";
 }
 
 void Playlist::shuffle() noexcept
@@ -103,8 +110,10 @@ void Playlist::unshuffle() noexcept
 void Playlist::skip() noexcept
 {
 	++current;
-	if (current == end())
-		std::cout << "Playlist ended\n";
+	if (current == end()){
+		current = begin();
+		std::cout << "Playlist ended, Starting form beginig\n";
+	}
 	else
 		std::cout << (*current).getDescription() << "\n";
 }

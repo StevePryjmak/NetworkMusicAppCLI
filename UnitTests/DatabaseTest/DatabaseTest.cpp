@@ -9,7 +9,31 @@ void clear_directories()
     createDirectories();
 }
 
-TEST(SongTest, saveLoadDelete) {
+TEST(SongTest, saveLoadDeleteSongWithLyrics) {
+    clear_directories();
+    SongDataInterface sdi;
+    unsigned int id = 1;
+	std::string name = "a a";
+	std::string artist = "b b";
+	std::string genre = "c c";
+    std::string lyrics = "Ciesz sie dostepem do tekstow utworow w KatalogPiosenek Premium";
+	unsigned int duration = 2;
+	unsigned int year = 3;
+    Song s1 = Song(id, name, artist, genre, lyrics ,duration, year);
+    EXPECT_NO_THROW(sdi.saveSong(s1));
+    Song s2 = sdi.loadSong(1);
+    EXPECT_EQ(s2.getId(), id);
+    EXPECT_EQ(s2.getName(), name);
+    EXPECT_EQ(s2.getArtist(), artist);
+    EXPECT_EQ(s2.getGenre(), genre);
+    EXPECT_EQ(s2.getLyrics(), lyrics);
+    EXPECT_EQ(s2.getDuration(), duration);
+    EXPECT_EQ(s2.getYear(), year);
+    sdi.deleteSong(1);
+    EXPECT_THROW(sdi.loadSong(1), std::runtime_error);
+}
+
+TEST(SongTest, saveLoadDeleteSongWithoutLyrics) {
     clear_directories();
     SongDataInterface sdi;
     unsigned int id = 1;
@@ -25,6 +49,7 @@ TEST(SongTest, saveLoadDelete) {
     EXPECT_EQ(s2.getName(), name);
     EXPECT_EQ(s2.getArtist(), artist);
     EXPECT_EQ(s2.getGenre(), genre);
+    EXPECT_EQ(s2.getLyrics(), "Sorry, we don't know the lyrics.");
     EXPECT_EQ(s2.getDuration(), duration);
     EXPECT_EQ(s2.getYear(), year);
     sdi.deleteSong(1);
@@ -54,7 +79,7 @@ TEST(SongTest, getRandom) {
 TEST(SongTest, IdIncrement) {
     clear_directories();
     SongDataInterface sdi;
-    int id = sdi.getNextIdAndIncrement();
+    unsigned int id = sdi.getNextIdAndIncrement();
     EXPECT_EQ(id, 1);
     id = sdi.getNextIdAndIncrement();
     EXPECT_EQ(id, 2);
@@ -63,6 +88,27 @@ TEST(SongTest, IdIncrement) {
     EXPECT_EQ(id, 3);
 }
 
+TEST(SongTest, getEmptyId) {
+    clear_directories();
+    SongDataInterface sdi;
+    unsigned int id = sdi.getNextIdAndIncrement();
+	std::string name = "a a";
+	std::string artist = "b b";
+	std::string genre = "c c";
+	unsigned int duration = 2;
+	unsigned int year = 3;
+    EXPECT_EQ(id, 1);
+    Song s1 = Song(id, name, artist, genre, duration, year);
+    sdi.saveSong(s1);
+    id = sdi.getNextIdAndIncrement();
+    EXPECT_EQ(id, 2);
+    s1 = Song(id, name, artist, genre, duration, year);
+    sdi.saveSong(s1);
+    EXPECT_EQ(sdi.getEmptyId(), 3);
+    EXPECT_NO_THROW(sdi.deleteSong(2));
+    EXPECT_EQ(sdi.getEmptyId(), 2);
+
+}
 
 TEST(UserTest, saveDelete) {
     clear_directories();
@@ -125,6 +171,30 @@ TEST(UserTest, validateUserData) {
     EXPECT_FALSE(udi.validUserData(login, "letmein"));
     EXPECT_FALSE(udi.validUserData("testuser2", pass));
     EXPECT_FALSE(udi.validUserData("admin", "admin"));
+}
+
+TEST(UserTest, loginsList) {
+    clear_directories();
+    std::string pass = "abc";
+    std::string login = "Kocham";
+    std::string name = "name";
+    unsigned int accessLevel = 0;
+    UserDataInterface udi;
+    EXPECT_NO_THROW(udi.addUser(name, login, pass, accessLevel));
+    EXPECT_NO_THROW(udi.addUser(name, "pisac", pass, 1));
+    EXPECT_NO_THROW(udi.addUser(name, "tEsTy", pass, 2));
+    EXPECT_NO_THROW(udi.addUser(name, "NAPRAWDE", pass, 3));
+    EXPECT_NO_THROW(udi.addUser(name, "123", pass, 4));
+    std::vector<std::string> logins = udi.getLogins();
+    EXPECT_EQ(logins.size(), 5);
+    EXPECT_EQ(logins[0], "123");
+    EXPECT_EQ(logins[1], "Kocham");
+    EXPECT_EQ(logins[2], "NAPRAWDE");
+    EXPECT_EQ(logins[3], "pisac");
+    EXPECT_EQ(logins[4], "tEsTy");
+    EXPECT_NO_THROW(udi.deleteUser("123"));
+    logins = udi.getLogins();
+    EXPECT_EQ(logins.size(), 4);
 }
 
 TEST(PlaylistTest, saveLoadDelete) {

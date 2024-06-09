@@ -249,7 +249,7 @@ void UserDataInterface::addUser(const std::string& name, const std::string& logi
 }
 
 void UserDataInterface::deleteUser(const std::string& login) const {
-	if (!std::filesystem::remove("users/" + replaceSpaces(login)+"/credentials.txt"))
+	if (!std::filesystem::remove_all("users/" + replaceSpaces(login)))
 		throw std::runtime_error("Unable to delete file");
 }
 
@@ -322,6 +322,18 @@ std::string UserDataInterface::getUserName(const std::string& login) const
 	return name;
 }
 
+std::vector<std::string> UserDataInterface::getLogins() const noexcept
+{
+	std::vector<std::string> logins;
+	if (std::filesystem::is_empty("users"))
+		return logins;
+	for (const auto& entry : std::filesystem::directory_iterator("users")) 
+	{
+        logins.push_back(restoreSpaces(entry.path().stem().string()));
+    }
+	return logins;
+}
+
 /*
 * Song
 * 
@@ -359,7 +371,7 @@ void SongDataInterface::saveNextId() const
 
 bool SongDataInterface::existId(unsigned int id) const noexcept
 {
-	std::ifstream file("public/song/" + std::to_string(id) + ".txt");
+	std::ifstream file("public/songs/" + std::to_string(id) + ".txt");
 	if (file.is_open())
 	{
 		file.close();
@@ -379,6 +391,14 @@ void SongDataInterface::saveSong(const Song& song) const
 	file<<replaceSpaces(song.getName())<<" "<<replaceSpaces(song.getArtist())<<" "<<replaceSpaces(song.getGenre())<<" "
 	<<song.getDuration()<<" "<<song.getYear()<<std::endl;
 	file.close();
+	std::ofstream lyrics("public/lyrics/text" + std::to_string(song.getId()) + ".txt");
+	if (!lyrics.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	if (song.getLyrics() == "") return;
+	lyrics<<song.getLyrics();
+	lyrics.close();
 }
 
 void SongDataInterface::deleteSong(unsigned int id) const
@@ -404,8 +424,14 @@ Song SongDataInterface::loadSong(unsigned int id) const
 	file>>duration;
 	unsigned int year;
 	file>>year;
+	std::ifstream lyrics("public/lyrics/text" + std::to_string(id) + ".txt");
+	std::ostringstream text;
+	if (lyrics.is_open())
+	{
+		text << lyrics.rdbuf();
+	}
 	Song s = Song(id, restoreSpaces(name), restoreSpaces(artist),
-	restoreSpaces(genre), duration, year);
+	restoreSpaces(genre), text.str(), duration, year);
 	file.close();
 	return s;
 }
@@ -467,9 +493,43 @@ bool SongDataInterface::songExists(std::string name) const noexcept
 	return false;
 }
 
+unsigned int SongDataInterface::getEmptyId() noexcept
+{
+	unsigned int id = 1;
+	while(existId(id))
+		id++;
+	if (id == nextId)
+		id = getNextIdAndIncrement();
+	return id;
+}
+
+unsigned int SongDataInterface::getSongId(std::string name) const {
+	for (unsigned int id : getSongsIds())
+	{
+		Song s = loadSong(id);
+		if (s.getName() == name)
+			return id;
+	}
+	throw std::runtime_error("Song not found");
+}
+bool SongDataInterface::checkIfAutorOfSong(std::string artist_name, unsigned int song_id) const {
+	std::ifstream file("public/songs/" + std::to_string(song_id) + ".txt");
+	if (!file.is_open())
+	{
+		throw std::runtime_error("Unable to open file");
+	}
+	std::string name;
+	file>>name;
+	file>>name;
+	file.close();
+	return name == artist_name;
+
+}
+
 void createDirectories() noexcept
 {
 	std::filesystem::create_directories("public/songs");
+	std::filesystem::create_directories("public/lyrics");
 	std::filesystem::create_directories("users");
 	std::ifstream f("id.txt");
 	if (!f.is_open())
