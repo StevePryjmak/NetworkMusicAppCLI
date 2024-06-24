@@ -183,12 +183,12 @@ void User::show_songs_from_database() {
     output = "Songs from database:\n";
     if (id_index >= songs_ids.size()) id_index = 0;
     // load 10 songs from database and change id_index
-    Playlist playlist("Database ");
+    database_temp = Playlist("Database");
     int count = 0;
     for (;id_index < songs_ids.size() && count < 10; ++id_index, ++count) {
-        playlist.addToPlaylist(songs_db.loadSong(songs_ids[id_index]));
+        database_temp.addToPlaylist(songs_db.loadSong(songs_ids[id_index]));
     }
-    initialize_songs_map(playlist);
+    initialize_songs_map(database_temp);
     if(id_index < songs_ids.size())  add_function(11, "Net page", std::function<void()>(std::bind(&User::show_songs_from_database, this)));
     if(id_index >= 11) add_function(12, "Previous page", std::function<void()>(std::bind(&User::show_songs_from_datbase_privious, this)));
     add_function(0, "Back to main menu", std::function<void()>(std::bind(&User::initialize_commands, this)));

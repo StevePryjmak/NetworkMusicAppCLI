@@ -31,6 +31,7 @@ protected:
     unsigned int login_index = 0;
 
     std::map<int, FunctionHolder> command_map;
+    Playlist database_temp;
     void virtual initialize_commands() = 0;
 public:
     virtual ~VirtualUser() = default;
